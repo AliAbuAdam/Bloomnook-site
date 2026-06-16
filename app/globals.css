@@ -1,0 +1,103 @@
+:root {
+  --green: #183512;
+  --green-2: #2C5530;
+  --green-3: #3E7A4A;
+  --sage: #EEF3EA;
+  --sage-2: #F4F8F1;
+  --cream: #FBFCF9;
+  --ink: #1C2419;
+  --muted: #6E7A6A;
+  --line: #E6EBE1;
+  --amber: #E0A03A;
+  --accent: #183512;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  color: var(--ink);
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #183512;
+  color: #fff;
+}
+
+input::placeholder {
+  color: #9aa69a;
+}
+
+a {
+  color: inherit;
+}
+
+.bn-h {
+  font-family: var(--font-playfair), Georgia, serif;
+  letter-spacing: -0.01em;
+}
+
+/* ---- keyframes ---- */
+@keyframes bnblink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.18; }
+}
+@keyframes bnring {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5); }
+  70% { box-shadow: 0 0 0 14px rgba(255, 255, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+@keyframes bntick {
+  0% { transform: translateY(-3px); opacity: 0.4; }
+  60% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* ---- interactive helpers (hover/transition can't be inline) ---- */
+.bn-hover-fade {
+  transition: opacity 0.2s;
+}
+.bn-hover-fade:hover {
+  opacity: 0.92;
+}
+
+.bn-hover-border {
+  transition: border-color 0.2s;
+}
+.bn-hover-border:hover {
+  border-color: var(--green-3);
+}
+
+/* category card */
+.bn-cat {
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.bn-cat:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 36px -26px rgba(24, 53, 18, 0.5);
+  border-color: var(--green-3);
+}
+
+/* product card */
+.bn-prod {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.bn-prod:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 24px 48px -30px rgba(24, 53, 18, 0.55);
+}
+
+/* reset native button */
+button {
+  font-family: inherit;
+}
