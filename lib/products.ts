@@ -1,6 +1,7 @@
 import {
   collection,
   getDocs,
+  getDoc,
   addDoc,
   updateDoc,
   deleteDoc,
@@ -31,6 +32,13 @@ export interface AdminProduct extends ProductInput {
 }
 
 export const PRODUCTS_COLLECTION = "products";
+export const ADMINS_COLLECTION = "admins";
+
+/** True, если для данного UID есть документ в коллекции `admins`. */
+export async function isAdminUser(uid: string): Promise<boolean> {
+  const snap = await getDoc(doc(db, ADMINS_COLLECTION, uid));
+  return snap.exists();
+}
 
 export const MOTIFS: Motif[] = ["tulip", "narcissus", "hyacinth", "lily", "crocus"];
 export const CATEGORIES = ["Тюльпаны", "Нарциссы", "Гиацинты", "Лилии", "Крокусы", "Ирисы"];

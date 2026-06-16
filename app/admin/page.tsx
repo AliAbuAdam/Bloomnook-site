@@ -16,6 +16,7 @@ import {
   updateProduct,
   deleteProduct,
   seedDemoProducts,
+  isAdminUser,
 } from "@/lib/products";
 
 const MOTIF_LABELS: Record<string, string> = {
@@ -63,12 +64,13 @@ const ghostBtn: React.CSSProperties = {
 
 export default function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [authReady, setAuthReady] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [loggingIn, setLoggingIn] = useState(false);
-  const authed = !!user;
+  const authed = !!user && isAdmin;
 
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [loading, setLoading] = useState(false);
@@ -79,8 +81,17 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    return onAuthStateChanged(auth, (u) => {
+    return onAuthStateChanged(auth, async (u) => {
       setUser(u);
+      if (u) {
+        try {
+          setIsAdmin(await isAdminUser(u.uid));
+        } catch {
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(false);
+      }
       setAuthReady(true);
     });
   }, []);
@@ -192,6 +203,25 @@ export default function AdminPage() {
     return (
       <main style={{ maxWidth: 1240, margin: "0 auto", padding: "80px 32px", textAlign: "center", color: "var(--muted)" }}>
         Загрузка…
+      </main>
+    );
+  }
+
+  // ---------- ВОШЁЛ, НО НЕ АДМИН ----------
+  if (user && !isAdmin) {
+    return (
+      <main style={{ maxWidth: 1240, margin: "0 auto", padding: "80px 32px", display: "flex", justifyContent: "center" }}>
+        <div style={{ width: "100%", maxWidth: 400, border: "1px solid var(--line)", borderRadius: 20, padding: 36, textAlign: "center" }}>
+          <h1 className="bn-h" style={{ fontSize: 26, fontWeight: 600, margin: "0 0 8px" }}>
+            Нет доступа
+          </h1>
+          <p style={{ fontSize: 14, color: "var(--muted)", margin: "0 0 24px" }}>
+            Аккаунт {user.email} не является администратором.
+          </p>
+          <button style={{ ...ghostBtn, width: "100%" }} onClick={handleLogout}>
+            Выйти
+          </button>
+        </div>
       </main>
     );
   }
