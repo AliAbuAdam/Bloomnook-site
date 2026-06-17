@@ -67,7 +67,7 @@ export default function Footer() {
                 Доставка через Ozon
               </a>
               <a href="#" style={{ color: "#fff", textDecoration: "none" }}>
-                Гарантия всхожести
+                Гарантия свежести
               </a>
               <Link href="/#faq" style={colLink}>
                 Вопросы и ответы

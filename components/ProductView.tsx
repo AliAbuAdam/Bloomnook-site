@@ -341,7 +341,7 @@ export default function ProductView() {
           >
             <Truck size={18} strokeWidth={1.7} style={{ stroke: "var(--green)", flex: "none" }} />
             <span>
-              <b>Доставка через Ozon</b> — оплата и доставка на стороне маркетплейса. Бесплатно от 2 000 ₽.
+              <b>Доставка через Ozon</b> — оплата и доставка на стороне маркетплейса. Бесплатно по всей России.
             </span>
           </div>
           <div style={{ fontSize: 13.5, color: "var(--muted)", lineHeight: 1.9 }}>

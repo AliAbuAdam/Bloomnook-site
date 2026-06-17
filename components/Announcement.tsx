@@ -31,7 +31,7 @@ export default function Announcement() {
         <span style={{ display: "flex", alignItems: "center", gap: 7, opacity: 0.92 }}>
           <Phone /> +7 495 000-00-00
         </span>
-        <span style={{ opacity: 0.95 }}>Бесплатная доставка через Ozon при заказе от 2 000 ₽</span>
+        <span style={{ opacity: 0.95 }}>Бесплатная доставка через Ozon по всей России</span>
         <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <a href="#" style={{ ...socialCircle, fontSize: 10, fontWeight: 700 }}>
             VK

@@ -197,7 +197,7 @@ export default function Home() {
                 <Shield size={19} strokeWidth={1.7} />
               </span>
               <div style={{ whiteSpace: "nowrap" }}>
-                <div style={{ fontWeight: 800, fontSize: 14 }}>Гарантия всхожести</div>
+                <div style={{ fontWeight: 800, fontSize: 14 }}>Гарантия свежести</div>
                 <div style={{ fontSize: 12, color: "var(--muted)" }}>заменим или вернём</div>
               </div>
             </div>
