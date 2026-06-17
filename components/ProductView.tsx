@@ -1,18 +1,126 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import Motif from "./Motif";
 import { Star, Heart, Truck, Minus, Plus, Check } from "./icons";
-import { sizes, productTabs, galleryMotifs } from "@/lib/data";
+import { fetchDisplayProductById } from "@/lib/products";
+import type { Product, Season } from "@/lib/data";
+
+const SEASON_LABEL: Record<Season, string> = {
+  autumn: "Осенняя посадка (сентябрь — октябрь)",
+  spring: "Весенняя посадка (апрель — май)",
+};
+
+/** Характеристики товара для таблицы — только заполненные поля. */
+function specs(p: Product): { label: string; value: string }[] {
+  return [
+    { label: "Класс / группа", value: p.cls },
+    { label: "Высота", value: p.height ? `${p.height} см` : "" },
+    { label: "Срок цветения", value: p.bloom },
+    { label: "Глубина посадки", value: p.depth ? `${p.depth} см` : "" },
+    { label: "Зона USDA", value: p.zone },
+    { label: "Применение", value: p.usage },
+  ].filter((s) => s.value);
+}
 
 export default function ProductView() {
+  const params = useSearchParams();
+  const id = params.get("id");
+
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
   const [gallery, setGallery] = useState(0);
-  const [sizeIdx, setSizeIdx] = useState(1);
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState(0);
 
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+    setGallery(0);
+    if (!id) {
+      setProduct(null);
+      setLoading(false);
+      return;
+    }
+    fetchDisplayProductById(id)
+      .then((p) => {
+        if (alive) setProduct(p);
+      })
+      .catch(() => {
+        if (alive) setProduct(null);
+      })
+      .finally(() => {
+        if (alive) setLoading(false);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [id]);
+
+  const crumb = (name: string) => (
+    <div style={{ background: "var(--sage-2)", borderBottom: "1px solid var(--line)" }}>
+      <div style={{ maxWidth: 1240, margin: "0 auto", padding: "36px 32px", fontSize: 14, color: "var(--muted)" }}>
+        <Link href="/" style={{ cursor: "pointer", color: "inherit", textDecoration: "none" }}>
+          Главная
+        </Link>{" "}
+        /&nbsp;{" "}
+        <Link href="/shop" style={{ cursor: "pointer", color: "inherit", textDecoration: "none" }}>
+          Магазин
+        </Link>{" "}
+        /&nbsp; <span style={{ color: "var(--ink)" }}>{name}</span>
+      </div>
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <>
+        {crumb("Товар")}
+        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "80px 32px", textAlign: "center", color: "var(--muted)" }}>
+          Загрузка…
+        </div>
+      </>
+    );
+  }
+
+  if (!product) {
+    return (
+      <>
+        {crumb("Товар не найден")}
+        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "80px 32px", textAlign: "center" }}>
+          <p style={{ fontSize: 16, color: "var(--muted)", margin: "0 0 20px" }}>
+            Такого товара нет или он был удалён.
+          </p>
+          <Link
+            href="/shop"
+            style={{
+              display: "inline-block",
+              background: "var(--accent)",
+              color: "#fff",
+              fontWeight: 700,
+              fontSize: 15,
+              padding: "12px 22px",
+              borderRadius: 999,
+              textDecoration: "none",
+            }}
+          >
+            Вернуться в магазин
+          </Link>
+        </div>
+      </>
+    );
+  }
+
+  const p = product;
+  const hasPhotos = p.images.length > 0;
+  const mainPhoto = hasPhotos ? p.images[Math.min(gallery, p.images.length - 1)] : null;
+  const specRows = specs(p);
+
   return (
     <>
+      {crumb(p.name)}
       <div
         style={{
           maxWidth: 1240,
@@ -39,126 +147,127 @@ export default function ProductView() {
               overflow: "hidden",
             }}
           >
-            <span
-              style={{
-                position: "absolute",
-                top: 18,
-                left: 18,
-                background: "var(--green)",
-                color: "#fff",
-                fontSize: 13,
-                fontWeight: 700,
-                padding: "6px 13px",
-                borderRadius: 999,
-                whiteSpace: "nowrap",
-              }}
-            >
-              −30%
-            </span>
-            <Motif href="#m-tulip" strokeWidth={2} style={{ width: "50%" }} />
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginTop: 14 }}>
-            {galleryMotifs.map((m, i) => (
-              <div
-                key={m}
-                onClick={() => setGallery(i)}
+            {p.hasDisc && p.disc && (
+              <span
                 style={{
-                  cursor: "pointer",
-                  background: "var(--sage-2)",
-                  border: gallery === i ? "2px solid var(--accent)" : "1.5px solid var(--line)",
-                  borderRadius: 14,
-                  aspectRatio: "1 / 1",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: 12,
+                  position: "absolute",
+                  top: 18,
+                  left: 18,
+                  background: "var(--green)",
+                  color: "#fff",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  padding: "6px 13px",
+                  borderRadius: 999,
+                  whiteSpace: "nowrap",
+                  zIndex: 1,
                 }}
               >
-                <Motif href={"#m-" + m} strokeWidth={3} style={{ width: "60%" }} />
-              </div>
-            ))}
+                {p.disc}
+              </span>
+            )}
+            {mainPhoto ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={mainPhoto} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              <Motif href={p.useHref} strokeWidth={2} style={{ width: "50%" }} />
+            )}
           </div>
+          {p.images.length > 1 && (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginTop: 14 }}>
+              {p.images.map((url, i) => (
+                <div
+                  key={url}
+                  onClick={() => setGallery(i)}
+                  style={{
+                    cursor: "pointer",
+                    background: "var(--sage-2)",
+                    border: gallery === i ? "2px solid var(--accent)" : "1.5px solid var(--line)",
+                    borderRadius: 14,
+                    aspectRatio: "1 / 1",
+                    overflow: "hidden",
+                  }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* info */}
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-            <span style={{ fontSize: 14, color: "var(--green-3)", fontWeight: 600 }}>Тюльпаны</span>
+            <span style={{ fontSize: 14, color: "var(--green-3)", fontWeight: 600 }}>{p.cat}</span>
             <span
               style={{
                 fontSize: 12,
                 fontWeight: 700,
-                color: "var(--green)",
-                background: "var(--sage)",
-                border: "1px solid #cfe0c6",
+                color: p.inStock ? "var(--green)" : "#9C3A26",
+                background: p.inStock ? "var(--sage)" : "#FCEDE9",
+                border: `1px solid ${p.inStock ? "#cfe0c6" : "#F0C5BA"}`,
                 padding: "4px 11px",
                 borderRadius: 999,
                 whiteSpace: "nowrap",
               }}
             >
-              В наличии
+              {p.inStock ? "В наличии" : "Под заказ"}
             </span>
           </div>
-          <h1 className="bn-h" style={{ fontSize: 40, fontWeight: 600, margin: "0 0 12px", lineHeight: 1.1 }}>
-            Тюльпан «Триумф», микс
+          <h1 className="bn-h" style={{ fontSize: 40, fontWeight: 600, margin: "0 0 6px", lineHeight: 1.1 }}>
+            {p.name}
           </h1>
+          {p.lat && (
+            <div style={{ fontSize: 15, color: "#aab3a8", fontStyle: "italic", marginBottom: 12 }}>{p.lat}</div>
+          )}
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
             <span style={{ display: "flex", gap: 2 }}>
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star key={i} size={17} />
               ))}
             </span>
-            <span style={{ fontSize: 14, color: "var(--muted)" }}>4.9 · 245 отзывов</span>
+            <span style={{ fontSize: 14, color: "var(--muted)" }}>{p.rating}</span>
           </div>
           <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 18 }}>
-            <span style={{ fontSize: 30, fontWeight: 800 }}>690 ₽</span>
-            <span style={{ fontSize: 18, color: "#aab3a8", textDecoration: "line-through" }}>990 ₽</span>
-            <span style={{ fontSize: 13, color: "var(--muted)" }}>/ упаковка</span>
+            <span style={{ fontSize: 30, fontWeight: 800 }}>{p.price}</span>
+            {p.old && (
+              <span style={{ fontSize: 18, color: "#aab3a8", textDecoration: "line-through" }}>{p.old}</span>
+            )}
           </div>
-          <p style={{ fontSize: 15, lineHeight: 1.65, color: "var(--muted)", margin: "0 0 26px", maxWidth: 520 }}>
-            Классические тюльпаны группы «Триумф» в яркой смеси окрасок. Крупная луковица 12/+, высокая всхожесть. Идеальны
-            для клумб, бордюров и срезки.
-          </p>
+          {p.color && (
+            <p style={{ fontSize: 15, lineHeight: 1.65, color: "var(--muted)", margin: "0 0 26px", maxWidth: 520 }}>
+              {p.color}.
+            </p>
+          )}
 
-          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>Фасовка</div>
-          <div style={{ display: "flex", gap: 12, marginBottom: 24 }}>
-            {sizes.map((s, i) => (
-              <div
-                key={s.n}
-                onClick={() => setSizeIdx(i)}
-                style={{
-                  cursor: "pointer",
-                  border: sizeIdx === i ? "2px solid var(--accent)" : "1.5px solid var(--line)",
-                  background: sizeIdx === i ? "var(--sage)" : "#fff",
-                  borderRadius: 14,
-                  padding: "14px 20px",
-                  textAlign: "center",
-                  minWidth: 110,
-                }}
-              >
-                <div style={{ fontWeight: 700, fontSize: 14 }}>{s.n}</div>
-                <div style={{ fontSize: 13, color: "var(--muted)", marginTop: 3 }}>{s.p}</div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>
-            Окраска: <span style={{ color: "var(--muted)", fontWeight: 600 }}>Микс</span>
-          </div>
-          <div style={{ display: "flex", gap: 10, marginBottom: 28 }}>
-            <span
+          {specRows.length > 0 && (
+            <div
               style={{
-                width: 30,
-                height: 30,
-                borderRadius: "50%",
-                background: "conic-gradient(#c45b8b,#e0a03a,#7a5bc4,#c45b8b)",
-                border: "2px solid #fff",
-                boxShadow: "0 0 0 2px var(--accent)",
+                border: "1px solid var(--line)",
+                borderRadius: 14,
+                padding: "6px 18px",
+                marginBottom: 26,
               }}
-            />
-            <span style={{ width: 30, height: 30, borderRadius: "50%", background: "#c45b8b", border: "2px solid #fff", boxShadow: "0 0 0 1.5px var(--line)" }} />
-            <span style={{ width: 30, height: 30, borderRadius: "50%", background: "#f4f4f4", border: "2px solid #fff", boxShadow: "0 0 0 1.5px var(--line)" }} />
-          </div>
+            >
+              {specRows.map((s, i) => (
+                <div
+                  key={s.label}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: 16,
+                    padding: "11px 0",
+                    fontSize: 14,
+                    borderTop: i === 0 ? "none" : "1px solid var(--line)",
+                  }}
+                >
+                  <span style={{ color: "var(--muted)" }}>{s.label}</span>
+                  <span style={{ fontWeight: 600, textAlign: "right" }}>{s.value}</span>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
             <div style={{ display: "flex", alignItems: "center", border: "1.5px solid var(--line)", borderRadius: 999, overflow: "hidden" }}>
@@ -236,14 +345,16 @@ export default function ProductView() {
             </span>
           </div>
           <div style={{ fontSize: 13.5, color: "var(--muted)", lineHeight: 1.9 }}>
+            {p.lat && (
+              <div>
+                <b style={{ color: "var(--ink)" }}>Сорт:</b> {p.lat}
+              </div>
+            )}
             <div>
-              <b style={{ color: "var(--ink)" }}>Артикул:</b> BN-TUL-0312
+              <b style={{ color: "var(--ink)" }}>Срок посадки:</b> {SEASON_LABEL[p.season]}
             </div>
             <div>
-              <b style={{ color: "var(--ink)" }}>Срок посадки:</b> сентябрь — октябрь
-            </div>
-            <div>
-              <b style={{ color: "var(--ink)" }}>Категории:</b> Тюльпаны, Луковичные, Осенняя посадка
+              <b style={{ color: "var(--ink)" }}>Категория:</b> {p.cat}
             </div>
           </div>
         </div>
@@ -252,9 +363,9 @@ export default function ProductView() {
       {/* tabs */}
       <div style={{ maxWidth: 1240, margin: "0 auto", padding: "40px 32px 24px" }}>
         <div style={{ display: "flex", gap: 36, borderBottom: "1px solid var(--line)", marginBottom: 28 }}>
-          {productTabs.map((label, i) => (
+          {["Описание", "Посадка и уход"].map((labelText, i) => (
             <button
-              key={label}
+              key={labelText}
               onClick={() => setTab(i)}
               style={{
                 border: "none",
@@ -269,30 +380,32 @@ export default function ProductView() {
                 marginBottom: -1,
               }}
             >
-              {label}
+              {labelText}
             </button>
           ))}
         </div>
 
         {tab === 0 && (
           <div style={{ maxWidth: 820, fontSize: 15, lineHeight: 1.75, color: "#42503f" }}>
-            <p style={{ margin: "0 0 16px" }}>
-              Тюльпаны группы «Триумф» — самые универсальные и неприхотливые. Крепкий цветонос высотой 40–50 см,
-              бокаловидный цветок, богатая палитра окрасок в одной смеси. Цветение — конец апреля — май.
-            </p>
-            <p style={{ margin: "0 0 18px" }}>
-              Луковицы откалиброваны (размер 12/+), просушены и обработаны от болезней. Подходят для открытого грунта,
-              контейнеров и выгонки.
-            </p>
+            {p.color && <p style={{ margin: "0 0 16px" }}>{p.color}.</p>}
+            {p.usage && (
+              <p style={{ margin: "0 0 18px" }}>
+                <b style={{ color: "var(--ink)" }}>Применение:</b> {p.usage}.
+              </p>
+            )}
             <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 10 }}>
-              <li style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                <Check size={18} strokeWidth={2} style={{ stroke: "var(--green)", flex: "none" }} />
-                Высокая всхожесть — гарантия 100%
-              </li>
-              <li style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                <Check size={18} strokeWidth={2} style={{ stroke: "var(--green)", flex: "none" }} />
-                Зимостойкость до −35 °C под укрытием
-              </li>
+              {p.cls && (
+                <li style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                  <Check size={18} strokeWidth={2} style={{ stroke: "var(--green)", flex: "none" }} />
+                  {p.cls}
+                </li>
+              )}
+              {p.height && (
+                <li style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                  <Check size={18} strokeWidth={2} style={{ stroke: "var(--green)", flex: "none" }} />
+                  Высота {p.height} см
+                </li>
+              )}
               <li style={{ display: "flex", gap: 10, alignItems: "center" }}>
                 <Check size={18} strokeWidth={2} style={{ stroke: "var(--green)", flex: "none" }} />
                 В комплекте — памятка по посадке
@@ -304,51 +417,21 @@ export default function ProductView() {
         {tab === 1 && (
           <div style={{ maxWidth: 820, fontSize: 15, lineHeight: 1.75, color: "#42503f" }}>
             <p style={{ margin: "0 0 14px" }}>
-              <b style={{ color: "var(--ink)" }}>Когда сажать:</b> с середины сентября до конца октября, когда почва остынет до +8…+10 °C.
+              <b style={{ color: "var(--ink)" }}>Когда сажать:</b> {SEASON_LABEL[p.season]}.
             </p>
-            <p style={{ margin: "0 0 14px" }}>
-              <b style={{ color: "var(--ink)" }}>Глубина и расстояние:</b> на глубину 3 высот луковицы (10–15 см), с шагом 8–10 см между луковицами.
-            </p>
+            {p.depth && (
+              <p style={{ margin: "0 0 14px" }}>
+                <b style={{ color: "var(--ink)" }}>Глубина посадки:</b> {p.depth} см.
+              </p>
+            )}
             <p style={{ margin: "0 0 14px" }}>
               <b style={{ color: "var(--ink)" }}>Почва:</b> рыхлая, дренированная, нейтральная. На зиму замульчируйте торфом или листвой.
             </p>
-            <p style={{ margin: 0 }}>
-              <b style={{ color: "var(--ink)" }}>Весной:</b> подкормите комплексным удобрением при появлении ростков.
-            </p>
-          </div>
-        )}
-
-        {tab === 2 && (
-          <div style={{ maxWidth: 820, display: "flex", flexDirection: "column", gap: 18 }}>
-            {[
-              { initials: "АП", name: "Андрей П.", city: "Москва", text: "Луковицы крупные, плотные. Посадил осенью — весной зацвели все. Рекомендую." },
-              { initials: "ЕС", name: "Елена С.", city: "Санкт-Петербург", text: "Окраски действительно разные и яркие. Доставка через Ozon — быстро и удобно." },
-            ].map((r) => (
-              <div key={r.initials} style={{ border: "1px solid var(--line)", borderRadius: 16, padding: 22 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                  <span
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: "50%",
-                      background: "var(--sage)",
-                      color: "var(--green)",
-                      fontWeight: 800,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {r.initials}
-                  </span>
-                  <div>
-                    <div style={{ fontWeight: 700 }}>{r.name}</div>
-                    <div style={{ fontSize: 12, color: "var(--muted)" }}>{r.city}</div>
-                  </div>
-                </div>
-                <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.65, color: "#42503f" }}>{r.text}</p>
-              </div>
-            ))}
+            {p.zone && (
+              <p style={{ margin: 0 }}>
+                <b style={{ color: "var(--ink)" }}>Зона зимостойкости (USDA):</b> {p.zone}.
+              </p>
+            )}
           </div>
         )}
       </div>

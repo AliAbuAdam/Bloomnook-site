@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Telegram, Play } from "./icons";
+import { Telegram, Yandex } from "./icons";
 
 const social: React.CSSProperties = {
   width: 38,
@@ -36,7 +36,7 @@ export default function Footer() {
                 <Telegram size={17} />
               </a>
               <a href="#" style={social}>
-                <Play size={17} />
+                <Yandex size={19} />
               </a>
             </div>
           </div>

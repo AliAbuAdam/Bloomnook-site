@@ -14,7 +14,7 @@ export default function ProductCard({
 }) {
   return (
     <Link
-      href="/product"
+      href={`/product?id=${item.id}`}
       className="bn-prod"
       style={{
         cursor: "pointer",
@@ -36,7 +36,8 @@ export default function ProductCard({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: 22,
+          padding: item.image ? 0 : 22,
+          overflow: "hidden",
         }}
       >
         {item.hasDisc && (
@@ -76,7 +77,12 @@ export default function ProductCard({
             <Heart size={16} />
           </span>
         )}
-        <Motif href={item.useHref} style={{ width: "58%" }} />
+        {item.image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={item.image} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        ) : (
+          <Motif href={item.useHref} style={{ width: "58%" }} />
+        )}
       </div>
       <div style={{ padding: "16px 16px 18px", display: "flex", flexDirection: "column", gap: 7, flex: 1 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -87,6 +93,15 @@ export default function ProductCard({
           </span>
         </div>
         <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, lineHeight: 1.3 }}>{item.name}</h3>
+        {item.lat && (
+          <span style={{ fontSize: 12.5, color: "#aab3a8", fontStyle: "italic", marginTop: -3 }}>{item.lat}</span>
+        )}
+        {(item.height || item.bloom) && (
+          <div style={{ fontSize: 12.5, color: "var(--muted)", display: "flex", flexWrap: "wrap", gap: "2px 12px" }}>
+            {item.height && <span>Высота: {item.height} см</span>}
+            {item.bloom && <span>Цветение: {item.bloom}</span>}
+          </div>
+        )}
         <div style={{ display: "flex", alignItems: "baseline", gap: 9, marginTop: 2 }}>
           <span style={{ fontSize: 18, fontWeight: 800, color: "var(--ink)" }}>{item.price}</span>
           {item.old && (

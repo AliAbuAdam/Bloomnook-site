@@ -1,25 +1,20 @@
-import Link from "next/link";
+import { Suspense } from "react";
 import ProductView from "@/components/ProductView";
-import ProductCard from "@/components/ProductCard";
+import LiveProductGrid from "@/components/LiveProductGrid";
 import { related } from "@/lib/data";
 
 export default function ProductPage() {
   return (
     <main>
-      <div style={{ background: "var(--sage-2)", borderBottom: "1px solid var(--line)" }}>
-        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "36px 32px", fontSize: 14, color: "var(--muted)" }}>
-          <Link href="/" style={{ cursor: "pointer", color: "inherit", textDecoration: "none" }}>
-            Главная
-          </Link>{" "}
-          /&nbsp;{" "}
-          <Link href="/shop" style={{ cursor: "pointer", color: "inherit", textDecoration: "none" }}>
-            Магазин
-          </Link>{" "}
-          /&nbsp; <span style={{ color: "var(--ink)" }}>Тюльпан «Триумф», микс</span>
-        </div>
-      </div>
-
-      <ProductView />
+      <Suspense
+        fallback={
+          <div style={{ maxWidth: 1240, margin: "0 auto", padding: "80px 32px", textAlign: "center", color: "var(--muted)" }}>
+            Загрузка…
+          </div>
+        }
+      >
+        <ProductView />
+      </Suspense>
 
       {/* related */}
       <div style={{ maxWidth: 1240, margin: "0 auto", padding: "48px 32px 80px" }}>
@@ -31,11 +26,7 @@ export default function ProductPage() {
             Вам также <span style={{ color: "var(--accent)", fontStyle: "italic" }}>понравится</span>
           </h2>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 22 }}>
-          {related.map((item) => (
-            <ProductCard key={item.id} item={item} />
-          ))}
-        </div>
+        <LiveProductGrid fallback={related} limit={4} columns={4} />
       </div>
     </main>
   );

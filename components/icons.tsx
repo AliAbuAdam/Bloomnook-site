@@ -57,7 +57,7 @@ export function ArrowRight({ size = 18, strokeWidth = 1.9, style }: IconProps) {
 export function Heart({ size = 21, strokeWidth = 1.7, style }: IconProps) {
   return (
     <svg {...strokeProps(size, strokeWidth, style)}>
-      <path d="M12 20s-7-4.6-9.3-9C1.2 8.4 2.7 5.3 6 5.3c2 0 3.2 1.3 4 2.4.8-1.1 2-2.4 4-2.4 3.3 0 4.8 3.1 3.3 5.7C19 15.4 12 20 12 20z" />
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </svg>
   );
 }
@@ -207,6 +207,25 @@ export function Play({ size = 13, style }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" style={{ width: size, height: size, fill: "currentColor", ...style }}>
       <path d="M10 9l5 3-5 3z" />
+    </svg>
+  );
+}
+
+/** Yandex brand mark — the "Я" glyph. */
+export function Yandex({ size = 14, style }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" style={{ width: size, height: size, ...style }}>
+      <text
+        x="12"
+        y="18"
+        textAnchor="middle"
+        fontSize="20"
+        fontWeight={800}
+        fontFamily="Arial, Helvetica, sans-serif"
+        fill="currentColor"
+      >
+        Я
+      </text>
     </svg>
   );
 }

@@ -1,4 +1,4 @@
-import { Phone, Telegram, Play } from "./icons";
+import { Phone, Telegram, Yandex } from "./icons";
 
 const socialCircle: React.CSSProperties = {
   width: 26,
@@ -40,7 +40,7 @@ export default function Announcement() {
             <Telegram />
           </a>
           <a href="#" style={socialCircle}>
-            <Play />
+            <Yandex size={15} />
           </a>
         </span>
       </div>

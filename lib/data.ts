@@ -1,5 +1,8 @@
 export type Motif = "tulip" | "narcissus" | "hyacinth" | "lily" | "crocus";
 
+/** Срок посадки луковиц. */
+export type Season = "autumn" | "spring";
+
 const NBSP = " ";
 const NNBSP = " ";
 const RUB = "₽";
@@ -15,61 +18,136 @@ export function discount(d: number): string {
   return MINUS + d + NNBSP + "%";
 }
 
+/** Месяцы, по которым строится фильтр «Срок цветения». */
+export const BLOOM_MONTHS = ["Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь"] as const;
+
+/** Нижняя граница высоты (см) из строки вида «60–70» или «45». 0 — если не распознано. */
+export function heightToCm(height: string): number {
+  const m = height.match(/\d+/);
+  return m ? Number(m[0]) : 0;
+}
+
+/** Месяцы цветения, упомянутые в строке вида «Июль-Август» — для фильтра. */
+export function bloomToMonths(bloom: string): string[] {
+  return BLOOM_MONTHS.filter((mn) => bloom.includes(mn));
+}
+
+/**
+ * Привести фото товара к массиву. Поддерживает и новое поле `images`, и старое
+ * `image` (одна картинка) — для совместимости со старыми записями в Firestore.
+ */
+export function normalizeImages(images?: unknown, image?: unknown): string[] {
+  if (Array.isArray(images)) return images.map(String).filter(Boolean);
+  const single = typeof image === "string" ? image : "";
+  return single ? [single] : [];
+}
+
 export interface Product {
   id: string | number;
   name: string;
+  lat: string;
   cat: string;
   motif: Motif;
+  image: string; // обложка (первое фото), "" — нет
+  images: string[]; // все фото товара; [] — нет
   useHref: string;
   price: string;
+  priceValue: number;
   old: string | null;
   disc: string | null;
   hasDisc: boolean;
   rating: string;
+  ratingValue: number;
+  inStock: boolean;
+  season: Season;
+  cls: string;
+  height: string;
+  heightCm: number;
+  bloom: string;
+  bloomMonths: string[];
+  depth: string;
+  zone: string;
+  color: string;
+  usage: string;
   tile: string;
 }
 
 interface RawProduct {
   id: number;
   name: string;
+  lat: string;
   cat: string;
   motif: Motif;
+  image?: string;
+  images?: string[];
   price: number;
   old: number;
   disc: number;
   rating: number;
+  inStock: boolean;
+  season: Season;
+  cls: string;
+  height: string;
+  bloom: string;
+  depth: string;
+  zone: string;
+  color: string;
+  usage: string;
 }
 
+// Реальный каталог Bloom Nook. Цена / старая цена / скидка — заглушки (0),
+// проставляются в админке. Срок посадки выведен по группе: тюльпаны — осень,
+// лилии / гименокаллис / эукомис / кринум — весна.
+// Реальный каталог из таблицы. Цена / старая цена / скидка / наличие — пустые
+// (заполняются в админке). Все агро-характеристики — из таблицы.
 export const RAW_PRODUCTS: RawProduct[] = [
-  { id: 1, name: "Тюльпан «Триумф», микс", cat: "Тюльпаны", motif: "tulip", price: 690, old: 990, disc: 30, rating: 4.9 },
-  { id: 2, name: "Нарцисс «Маунт Худ»", cat: "Нарциссы", motif: "narcissus", price: 540, old: 720, disc: 25, rating: 4.8 },
-  { id: 3, name: "Гиацинт «Дельфт Блю»", cat: "Гиацинты", motif: "hyacinth", price: 480, old: 600, disc: 20, rating: 5.0 },
-  { id: 4, name: "Лилия «Касабланка»", cat: "Лилии", motif: "lily", price: 920, old: 1150, disc: 20, rating: 4.9 },
-  { id: 5, name: "Крокус «Жанна д’Арк»", cat: "Крокусы", motif: "crocus", price: 320, old: 420, disc: 24, rating: 4.7 },
-  { id: 6, name: "Тюльпан «Дарвин», красный", cat: "Тюльпаны", motif: "tulip", price: 750, old: 990, disc: 24, rating: 4.8 },
-  { id: 7, name: "Нарцисс «Тет-а-Тет»", cat: "Нарциссы", motif: "narcissus", price: 420, old: 0, disc: 0, rating: 4.9 },
-  { id: 8, name: "Гиацинт «Пинк Перл»", cat: "Гиацинты", motif: "hyacinth", price: 510, old: 640, disc: 20, rating: 4.8 },
-  { id: 9, name: "Лилия «Стар Гейзер»", cat: "Лилии", motif: "lily", price: 870, old: 1090, disc: 20, rating: 5.0 },
-  { id: 10, name: "Крокус, ботанический микс", cat: "Крокусы", motif: "crocus", price: 290, old: 390, disc: 25, rating: 4.7 },
-  { id: 11, name: "Тюльпан «Куин оф Найт»", cat: "Тюльпаны", motif: "tulip", price: 820, old: 0, disc: 0, rating: 4.9 },
-  { id: 12, name: "Гиацинт «Карнеги», белый", cat: "Гиацинты", motif: "hyacinth", price: 470, old: 590, disc: 20, rating: 4.6 },
+  { id: 1, name: "Тюльпан «Лондон»", lat: "London", cat: "Тюльпан", motif: "tulip", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "autumn", cls: "Класс 5 (Дарвиновы гибриды)", height: "60–70", bloom: "Май (середина)", depth: "15–20", zone: "3–4", color: "Кроваво-красный с жёлтым дном, дно чёрно-коричневое", usage: "Срезка, группы" },
+  { id: 2, name: "Тюльпан «Айс Крим»", lat: "Ice Cream", cat: "Тюльпан", motif: "tulip", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "autumn", cls: "Класс 11 (Махровый поздний)", height: "35–40", bloom: "Май (конец)", depth: "10–12", zone: "4", color: "Белый центр в окружении розовых лепестков, похож на мороженое", usage: "Контейнеры, бордюры" },
+  { id: 3, name: "Тюльпан «Турмале»", lat: "Tourmalet", cat: "Тюльпан", motif: "tulip", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "autumn", cls: "Класс 7 (Бахромчатый)", height: "45–50", bloom: "Май", depth: "12–15", zone: "4", color: "Красный с ярко-жёлтой бахромой, бокал 7,5 см", usage: "Новинка 2022 года" },
+  { id: 4, name: "Тюльпан «Аспирант»", lat: "Aspirant", cat: "Тюльпан", motif: "tulip", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "autumn", cls: "Класс 3 (Триумф)", height: "50–55", bloom: "Май (начало)", depth: "15", zone: "3–4", color: "Красный с белой каймой, неприхотлив, сизая листва", usage: "Озеленение" },
+  { id: 5, name: "Тюльпан «Каньон»", lat: "Canyon", cat: "Тюльпан", motif: "tulip", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "autumn", cls: "Класс 11 (Махровый поздний)", height: "45", bloom: "Май (конец)", depth: "12", zone: "4", color: "Пурпурно-красный, почти чёрный в тени", usage: "Декор, срезка" },
+  { id: 6, name: "Лилия «Старгейзер»", lat: "Stargazer", cat: "Лилия", motif: "lily", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "spring", cls: "Восточный гибрид", height: "80–100", bloom: "Июль-Август", depth: "15–20", zone: "5", color: "Малиново-розовый с крапом, направлен вверх", usage: "Ароматные букеты" },
+  { id: 7, name: "Лилия «Аннамари Дрим»", lat: "Annemarie's Dream", cat: "Лилия", motif: "lily", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "spring", cls: "Азиатский гибрид", height: "70–80", bloom: "Июнь-Июль", depth: "15", zone: "3–4", color: "Махровая, белоснежная, без запаха и пыльцы", usage: "Аллергикам" },
+  { id: 8, name: "Лилия «Эприкот Фадж»", lat: "Apricot Fudge", cat: "Лилия", motif: "lily", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "spring", cls: "Азиатский гибрид", height: "60–70", bloom: "Июль", depth: "15", zone: "4", color: "Уникальная форма «розочки», абрикосовый цвет", usage: "Флористика" },
+  { id: 9, name: "Нарцисс «Пауэлла Альба»", lat: "Powellii Album", cat: "Нарцисс", motif: "narcissus", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "spring", cls: "Видовой / Кринум", height: "60–90", bloom: "Август", depth: "20", zone: "6–7", color: "Крупные белые колокольчатые цветы", usage: "Солитер, юг РФ" },
+  { id: 10, name: "Гименокаллис «Адванс»", lat: "Advance", cat: "Гименокаллис", motif: "narcissus", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "spring", cls: "Исмене (Ismene)", height: "45–60", bloom: "Июнь-Июль", depth: "10", zone: "8", color: "Белый, экзотический вид, аромат ванили", usage: "Контейнеры" },
+  { id: 11, name: "Эукомис «Биколор»", lat: "Bicolor", cat: "Эукомис", motif: "lily", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "spring", cls: "Хохлатый лилейник", height: "30–60", bloom: "Июль-Август", depth: "12", zone: "7–8", color: "Зелёно-белый с пурпурной каймой, вид «ананаса»", usage: "Рокарии, кадки" },
 ];
 
 const TILE_TINTS = ["#EEF3EA", "#F5F2E8"];
 
-export const products: Product[] = RAW_PRODUCTS.map((p, i) => ({
+export const products: Product[] = RAW_PRODUCTS.map((p, i) => {
+  const images = normalizeImages(p.images, p.image);
+  return {
   id: p.id,
   name: p.name,
+  lat: p.lat,
   cat: p.cat,
   motif: p.motif,
+  image: images[0] ?? "",
+  images,
   useHref: "#m-" + p.motif,
-  price: money(p.price),
+  price: p.price ? money(p.price) : "Цена по запросу",
+  priceValue: p.price,
   old: p.old ? money(p.old) : null,
   disc: p.disc ? discount(p.disc) : null,
   hasDisc: !!p.disc,
   rating: p.rating.toFixed(1),
+  ratingValue: p.rating,
+  inStock: p.inStock,
+  season: p.season,
+  cls: p.cls,
+  height: p.height,
+  heightCm: heightToCm(p.height),
+  bloom: p.bloom,
+  bloomMonths: bloomToMonths(p.bloom),
+  depth: p.depth,
+  zone: p.zone,
+  color: p.color,
+  usage: p.usage,
   tile: TILE_TINTS[i % 2],
-}));
+  };
+});
 
 export const bestsellers = products.slice(0, 4);
 export const related = products.slice(5, 9);
