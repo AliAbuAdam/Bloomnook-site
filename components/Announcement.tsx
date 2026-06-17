@@ -16,6 +16,7 @@ export default function Announcement() {
   return (
     <div style={{ background: "var(--green)", color: "#fff" }}>
       <div
+        className="bn-pad"
         style={{
           maxWidth: 1240,
           margin: "0 auto",
@@ -28,10 +29,10 @@ export default function Announcement() {
           fontWeight: 500,
         }}
       >
-        <span style={{ display: "flex", alignItems: "center", gap: 7, opacity: 0.92 }}>
-          <Phone /> +7 495 000-00-00
+        <span className="bn-ann-phone" style={{ display: "flex", alignItems: "center", gap: 7, opacity: 0.92 }}>
+          <Phone /> <span>+7 495 000-00-00</span>
         </span>
-        <span style={{ opacity: 0.95 }}>Бесплатная доставка через Ozon по всей России</span>
+        <span className="bn-ann-tagline" style={{ opacity: 0.95 }}>Бесплатная доставка через Ozon по всей России</span>
         <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <a href="#" style={{ ...socialCircle, fontSize: 10, fontWeight: 700 }}>
             VK

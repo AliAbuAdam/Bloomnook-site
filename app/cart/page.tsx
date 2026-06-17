@@ -13,8 +13,8 @@ export default function CartPage() {
   return (
     <main>
       <div style={{ background: "var(--sage-2)", borderBottom: "1px solid var(--line)" }}>
-        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "48px 32px", textAlign: "center" }}>
-          <h1 className="bn-h" style={{ fontSize: 46, fontWeight: 600, margin: 0 }}>
+        <div className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "48px 32px", textAlign: "center" }}>
+          <h1 className="bn-h" style={{ fontSize: "clamp(30px, 6vw, 46px)", fontWeight: 600, margin: 0 }}>
             Корзина
           </h1>
           <div style={{ fontSize: 14, color: "var(--muted)", marginTop: 10 }}>
@@ -27,6 +27,7 @@ export default function CartPage() {
       </div>
 
       <div
+        className="bn-pad bn-stack-md"
         style={{
           maxWidth: 1240,
           margin: "0 auto",
@@ -39,6 +40,7 @@ export default function CartPage() {
       >
         <div>
           <div
+            className="bn-cart-head"
             style={{
               display: "grid",
               gridTemplateColumns: gridCols,
@@ -59,6 +61,7 @@ export default function CartPage() {
           {cart.map((c) => (
             <div
               key={c.name}
+              className="bn-cart-row"
               style={{
                 display: "grid",
                 gridTemplateColumns: gridCols,
@@ -68,7 +71,7 @@ export default function CartPage() {
                 borderBottom: "1px solid var(--line)",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <div className="bn-cc-prod" style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <span
                   style={{
                     width: 60,
@@ -88,8 +91,8 @@ export default function CartPage() {
                   <div style={{ fontSize: 13, color: "var(--muted)" }}>{c.cat}</div>
                 </div>
               </div>
-              <span style={{ fontWeight: 600 }}>{c.price}</span>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span className="bn-cc-price" style={{ fontWeight: 600 }}>{c.price}</span>
+              <div className="bn-cc-qty" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <div style={{ display: "flex", alignItems: "center", border: "1.5px solid var(--line)", borderRadius: 999 }}>
                   <span style={{ width: 36, height: 40, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--muted)", cursor: "pointer" }}>
                     <Minus size={16} />
@@ -100,8 +103,8 @@ export default function CartPage() {
                   </span>
                 </div>
               </div>
-              <span style={{ fontWeight: 800, textAlign: "right" }}>{c.sub}</span>
-              <span style={{ display: "flex", justifyContent: "center", color: "#b9c2b6", cursor: "pointer" }}>
+              <span className="bn-cc-sum" style={{ fontWeight: 800, textAlign: "right" }}>{c.sub}</span>
+              <span className="bn-cc-del" style={{ display: "flex", justifyContent: "center", color: "#b9c2b6", cursor: "pointer" }}>
                 <Close />
               </span>
             </div>

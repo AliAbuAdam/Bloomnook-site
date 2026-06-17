@@ -406,7 +406,7 @@ export default function AdminPage() {
   // ---------- ПРОВЕРКА СЕССИИ ----------
   if (!authReady) {
     return (
-      <main style={{ maxWidth: 1240, margin: "0 auto", padding: "80px 32px", textAlign: "center", color: "var(--muted)" }}>
+      <main className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "80px 32px", textAlign: "center", color: "var(--muted)" }}>
         Загрузка…
       </main>
     );
@@ -415,7 +415,7 @@ export default function AdminPage() {
   // ---------- ВОШЁЛ, НО НЕ АДМИН ----------
   if (user && !isAdmin) {
     return (
-      <main style={{ maxWidth: 1240, margin: "0 auto", padding: "80px 32px", display: "flex", justifyContent: "center" }}>
+      <main className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "80px 32px", display: "flex", justifyContent: "center" }}>
         <div style={{ width: "100%", maxWidth: 400, border: "1px solid var(--line)", borderRadius: 20, padding: 36, textAlign: "center" }}>
           <h1 className="bn-h" style={{ fontSize: 26, fontWeight: 600, margin: "0 0 8px" }}>
             Нет доступа
@@ -434,7 +434,7 @@ export default function AdminPage() {
   // ---------- LOGIN ----------
   if (!authed) {
     return (
-      <main style={{ maxWidth: 1240, margin: "0 auto", padding: "80px 32px", display: "flex", justifyContent: "center" }}>
+      <main className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "80px 32px", display: "flex", justifyContent: "center" }}>
         <form
           onSubmit={handleLogin}
           style={{ width: "100%", maxWidth: 400, border: "1px solid var(--line)", borderRadius: 20, padding: 36 }}
@@ -463,9 +463,9 @@ export default function AdminPage() {
 
   // ---------- PRODUCT MANAGER ----------
   return (
-    <main style={{ maxWidth: 1240, margin: "0 auto", padding: "48px 32px 80px" }}>
+    <main className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "48px 32px 80px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 8, flexWrap: "wrap" }}>
-        <h1 className="bn-h" style={{ fontSize: 36, fontWeight: 600, margin: 0 }}>
+        <h1 className="bn-h" style={{ fontSize: "clamp(26px, 5vw, 36px)", fontWeight: 600, margin: 0 }}>
           Товары
         </h1>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -506,7 +506,7 @@ export default function AdminPage() {
           <h2 className="bn-h" style={{ fontSize: 22, fontWeight: 600, margin: "0 0 18px" }}>
             {editingId ? "Редактировать товар" : "Новый товар"}
           </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
+          <div className="bn-admin-form-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
             <div style={{ gridColumn: "span 3" }}>
               <label style={label}>
                 Фото товара{" "}
@@ -771,6 +771,7 @@ export default function AdminPage() {
       ) : (
         <div style={{ border: "1px solid var(--line)", borderRadius: 16, overflow: "hidden" }}>
           <div
+            className="bn-admin-head"
             style={{
               display: "grid",
               gridTemplateColumns: "56px 2.4fr 1.2fr 1fr 1fr 0.8fr 160px",
@@ -793,6 +794,7 @@ export default function AdminPage() {
           {products.map((p) => (
             <div
               key={p.id}
+              className="bn-admin-row"
               style={{
                 display: "grid",
                 gridTemplateColumns: "56px 2.4fr 1.2fr 1fr 1fr 0.8fr 160px",
@@ -803,7 +805,7 @@ export default function AdminPage() {
                 fontSize: 14,
               }}
             >
-              <span style={{ width: 44, height: 44, borderRadius: 10, background: "var(--sage)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+              <span className="bn-ar-img" style={{ width: 44, height: 44, borderRadius: 10, background: "var(--sage)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
                 {p.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={p.image} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -811,12 +813,12 @@ export default function AdminPage() {
                   <Motif href={"#m-" + p.motif} strokeWidth={3} style={{ width: 24 }} />
                 )}
               </span>
-              <span style={{ fontWeight: 700 }}>{p.name}</span>
-              <span style={{ color: "var(--muted)" }}>{p.cat}</span>
-              <span style={{ fontWeight: 700 }}>{money(p.price)}</span>
-              <span style={{ color: p.disc ? "var(--green)" : "var(--muted)" }}>{p.disc ? `−${p.disc}%` : "—"}</span>
-              <span style={{ color: p.inStock ? "var(--green)" : "#c0392b", fontWeight: 600 }}>{p.inStock ? "В наличии" : "Под заказ"}</span>
-              <span style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+              <span className="bn-ar-name" style={{ fontWeight: 700 }}>{p.name}</span>
+              <span className="bn-ar-cat" style={{ color: "var(--muted)" }}>{p.cat}</span>
+              <span className="bn-ar-price" style={{ fontWeight: 700 }}>{money(p.price)}</span>
+              <span className="bn-ar-disc" style={{ color: p.disc ? "var(--green)" : "var(--muted)" }}>{p.disc ? `−${p.disc}%` : "—"}</span>
+              <span className="bn-ar-stock" style={{ color: p.inStock ? "var(--green)" : "#c0392b", fontWeight: 600 }}>{p.inStock ? "В наличии" : "Под заказ"}</span>
+              <span className="bn-ar-act" style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
                 <button style={{ ...ghostBtn, padding: "7px 14px", fontSize: 13 }} onClick={() => openEdit(p)}>
                   Изм.
                 </button>

@@ -21,8 +21,8 @@ const colList: React.CSSProperties = { display: "flex", flexDirection: "column",
 export default function Footer() {
   return (
     <footer style={{ background: "var(--green)", color: "#fff" }}>
-      <div style={{ maxWidth: 1240, margin: "0 auto", padding: "64px 32px 28px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr 1fr 1.2fr", gap: 40 }}>
+      <div className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "64px 32px 28px" }}>
+        <div className="bn-footer-grid" style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr 1fr 1.2fr", gap: 40 }}>
           <div>
             <Image src="/footer_logo.svg" alt="Bloom Nook" width={116} height={44} style={{ height: 44, width: "auto", marginBottom: 18 }} />
             <p style={{ fontSize: 14, lineHeight: 1.7, opacity: 0.8, margin: "0 0 22px", maxWidth: 300 }}>

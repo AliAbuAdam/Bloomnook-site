@@ -141,3 +141,191 @@ button {
 .bn-range::-moz-range-track {
   background: none;
 }
+
+/* ============================================================
+   RESPONSIVE LAYER
+   Inline styles can't hold @media rules, so adaptive behaviour
+   lives here. These classes use !important to override the
+   inline grid-template-columns / padding they're attached to.
+   Breakpoints: 1024 (tablet) · 900/768 (stack) · 640 (phone).
+   ============================================================ */
+
+/* avoid stray horizontal scroll from floating decor / overflows.
+   `clip` (not `hidden`) so it doesn't turn body into a scroll
+   container — `hidden` would break position: sticky everywhere. */
+html,
+body {
+  overflow-x: clip;
+}
+
+/* --- container side padding: shrink the 32px sides on phones --- */
+@media (max-width: 640px) {
+  .bn-pad {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+}
+
+/* --- multi-column product / content grids --- */
+@media (max-width: 1024px) {
+  .bn-g-cats { grid-template-columns: repeat(4, 1fr) !important; }
+  .bn-g-prod4 { grid-template-columns: repeat(3, 1fr) !important; }
+  .bn-g-prod3 { grid-template-columns: repeat(2, 1fr) !important; }
+  .bn-g-3 { grid-template-columns: repeat(2, 1fr) !important; }
+  .bn-g-steps { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 900px) {
+  .bn-stack { grid-template-columns: 1fr !important; }
+  .bn-footer-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  /* hero: show the photo + chips above the heading when stacked,
+     and cap its size so it doesn't eat the whole screen */
+  .bn-hero-visual {
+    order: -1;
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto;
+  }
+}
+@media (max-width: 640px) {
+  .bn-hero-visual { max-width: 260px; }
+}
+@media (max-width: 640px) {
+  .bn-g-cats { grid-template-columns: repeat(3, 1fr) !important; }
+  .bn-g-prod4 { grid-template-columns: repeat(2, 1fr) !important; }
+  .bn-g-prod3 { grid-template-columns: repeat(2, 1fr) !important; }
+  .bn-g-3 { grid-template-columns: 1fr !important; }
+  .bn-footer-grid { grid-template-columns: 1fr !important; }
+}
+
+/* --- header: desktop nav vs. burger --- */
+.bn-burger { display: none; }
+@media (max-width: 900px) {
+  .bn-nav-desktop { display: none !important; }
+  .bn-burger { display: inline-flex !important; }
+}
+/* hide the search/heart/user icon row on small phones, keep cart + burger */
+@media (max-width: 480px) {
+  .bn-hide-xs { display: none !important; }
+}
+
+/* mobile slide-in nav drawer */
+.bn-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 30, 18, 0.45);
+  z-index: 60;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.bn-drawer-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.bn-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(82vw, 320px);
+  background: #fff;
+  z-index: 61;
+  box-shadow: -16px 0 40px -20px rgba(24, 53, 18, 0.5);
+  transform: translateX(100%);
+  transition: transform 0.28s ease;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 22px 32px;
+}
+.bn-drawer.open {
+  transform: translateX(0);
+}
+
+/* --- announcement: drop the middle tagline on narrow screens --- */
+@media (max-width: 760px) {
+  .bn-ann-tagline { display: none !important; }
+}
+@media (max-width: 480px) {
+  .bn-ann-phone span { display: none; }
+}
+
+/* --- two-column content layouts that should stack --- */
+@media (max-width: 860px) {
+  .bn-stack-md { grid-template-columns: 1fr !important; }
+}
+
+/* --- seasonal countdown: shrink the cards on phones --- */
+@media (max-width: 520px) {
+  .bn-count-card { width: 62px !important; height: 74px !important; }
+  .bn-count-digit { font-size: 32px !important; }
+  .bn-count-colon { font-size: 26px !important; margin-top: 20px !important; }
+}
+
+/* --- shop filters: turn the sidebar into a slide-in panel --- */
+.bn-filter-toggle { display: none; }
+@media (max-width: 1024px) {
+  .bn-shop-grid { grid-template-columns: 1fr !important; }
+  .bn-filter-toggle { display: inline-flex !important; }
+  .bn-filters {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0;
+    height: 100%;
+    width: min(86vw, 340px);
+    background: #fff;
+    z-index: 61;
+    padding: 22px !important;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.28s ease;
+    box-shadow: 16px 0 40px -20px rgba(24, 53, 18, 0.5);
+  }
+  .bn-filters.open { transform: translateX(0); }
+  .bn-filter-close { display: flex !important; }
+}
+.bn-filter-close { display: none; }
+
+/* --- cart rows: table on desktop, stacked card on phones --- */
+@media (max-width: 768px) {
+  .bn-cart-head { display: none !important; }
+  .bn-cart-row {
+    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-areas:
+      "prod prod del"
+      "price qty sum" !important;
+    row-gap: 16px !important;
+    align-items: center;
+  }
+  .bn-cc-prod { grid-area: prod; }
+  .bn-cc-del { grid-area: del; }
+  .bn-cc-price { grid-area: price; }
+  .bn-cc-qty { grid-area: qty; justify-content: flex-start !important; }
+  .bn-cc-sum { grid-area: sum; }
+}
+
+/* --- admin product form: 3 cols → 1 on phones --- */
+@media (max-width: 760px) {
+  .bn-admin-form-grid { grid-template-columns: 1fr !important; }
+  .bn-admin-form-grid > * { grid-column: auto !important; }
+}
+/* --- admin product list: table → card on phones --- */
+@media (max-width: 760px) {
+  .bn-admin-head { display: none !important; }
+  .bn-admin-row {
+    grid-template-columns: 44px 1fr 1fr !important;
+    grid-template-areas:
+      "img   name  name"
+      "img   cat   cat"
+      "price disc  stock"
+      "act   act   act" !important;
+    row-gap: 8px !important;
+    align-items: center;
+  }
+  .bn-ar-img { grid-area: img; }
+  .bn-ar-name { grid-area: name; }
+  .bn-ar-cat { grid-area: cat; }
+  .bn-ar-price { grid-area: price; }
+  .bn-ar-disc { grid-area: disc; }
+  .bn-ar-stock { grid-area: stock; }
+  .bn-ar-act { grid-area: act; justify-content: flex-start !important; margin-top: 4px; }
+}

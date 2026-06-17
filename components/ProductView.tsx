@@ -65,7 +65,7 @@ export default function ProductView() {
 
   const crumb = (name: string) => (
     <div style={{ background: "var(--sage-2)", borderBottom: "1px solid var(--line)" }}>
-      <div style={{ maxWidth: 1240, margin: "0 auto", padding: "36px 32px", fontSize: 14, color: "var(--muted)" }}>
+      <div className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "36px 32px", fontSize: 14, color: "var(--muted)" }}>
         <Link href="/" style={{ cursor: "pointer", color: "inherit", textDecoration: "none" }}>
           Главная
         </Link>{" "}
@@ -82,7 +82,7 @@ export default function ProductView() {
     return (
       <>
         {crumb("Товар")}
-        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "80px 32px", textAlign: "center", color: "var(--muted)" }}>
+        <div className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "80px 32px", textAlign: "center", color: "var(--muted)" }}>
           Загрузка…
         </div>
       </>
@@ -93,7 +93,7 @@ export default function ProductView() {
     return (
       <>
         {crumb("Товар не найден")}
-        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "80px 32px", textAlign: "center" }}>
+        <div className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "80px 32px", textAlign: "center" }}>
           <p style={{ fontSize: 16, color: "var(--muted)", margin: "0 0 20px" }}>
             Такого товара нет или он был удалён.
           </p>
@@ -138,6 +138,7 @@ export default function ProductView() {
     <>
       {crumb(p.name)}
       <div
+        className="bn-pad bn-stack-md"
         style={{
           maxWidth: 1240,
           margin: "0 auto",
@@ -231,7 +232,7 @@ export default function ProductView() {
               {p.inStock ? "В наличии" : "Под заказ"}
             </span>
           </div>
-          <h1 className="bn-h" style={{ fontSize: 40, fontWeight: 600, margin: "0 0 6px", lineHeight: 1.1 }}>
+          <h1 className="bn-h" style={{ fontSize: "clamp(28px, 5.5vw, 40px)", fontWeight: 600, margin: "0 0 6px", lineHeight: 1.1 }}>
             {p.name}
           </h1>
           {p.lat && (
@@ -340,7 +341,7 @@ export default function ProductView() {
           <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>
             {activePack > 1 ? "Количество комплектов" : "Количество"}
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14, flexWrap: "wrap" }}>
             <div style={{ display: "flex", alignItems: "center", border: "1.5px solid var(--line)", borderRadius: 999, overflow: "hidden" }}>
               <button
                 onClick={() => setQty((q) => Math.max(1, q - 1))}
@@ -440,7 +441,7 @@ export default function ProductView() {
       </div>
 
       {/* tabs */}
-      <div style={{ maxWidth: 1240, margin: "0 auto", padding: "40px 32px 24px" }}>
+      <div className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "40px 32px 24px" }}>
         <div style={{ display: "flex", gap: 36, borderBottom: "1px solid var(--line)", marginBottom: 28 }}>
           {["Описание", "Посадка и уход"].map((labelText, i) => (
             <button

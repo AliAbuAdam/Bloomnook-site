@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Manrope } from "next/font/google";
 import "./globals.css";
 import MotifSprite from "@/components/MotifSprite";
@@ -24,6 +24,11 @@ export const metadata: Metadata = {
   title: "Bloom Nook — луковицы цветов с доставкой через Ozon",
   description:
     "Отборный посадочный материал тюльпанов, нарциссов, гиацинтов и лилий. Заказ и доставка — через Ozon, удобно и безопасно.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

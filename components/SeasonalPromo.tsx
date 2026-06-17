@@ -66,12 +66,13 @@ export default function SeasonalPromo() {
   }, []);
 
   return (
-    <section style={{ maxWidth: 1240, margin: "0 auto", padding: "72px 32px" }}>
+    <section className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "72px 32px" }}>
       <div
+        className="bn-stack-md"
         style={{
           background: "var(--green)",
           borderRadius: 28,
-          padding: 56,
+          padding: "clamp(28px, 5vw, 56px)",
           display: "grid",
           gridTemplateColumns: "1.2fr 1fr",
           gap: 40,
@@ -90,7 +91,7 @@ export default function SeasonalPromo() {
           <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", opacity: 0.8 }}>
             Ограниченное предложение
           </span>
-          <h2 className="bn-h" style={{ fontSize: 46, fontWeight: 600, margin: "12px 0 8px" }}>
+          <h2 className="bn-h" style={{ fontSize: "clamp(30px, 5vw, 46px)", fontWeight: 600, margin: "12px 0 8px" }}>
             Осенняя <span style={{ fontStyle: "italic", color: "#CFE3C6" }}>посадка</span>
           </h2>
           <p style={{ fontSize: 17, opacity: 0.85, margin: "0 0 26px", maxWidth: 380 }}>
@@ -138,43 +139,43 @@ export default function SeasonalPromo() {
           </div>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 8, justifyContent: "flex-start" }}>
             <div style={{ textAlign: "center" }}>
-              <div style={card}>
-                <span className="bn-h" style={digit}>
+              <div className="bn-count-card" style={card}>
+                <span className="bn-h bn-count-digit" style={digit}>
                   {t.days}
                 </span>
               </div>
               <div style={caption}>дней</div>
             </div>
-            <span className="bn-h" style={colon}>
+            <span className="bn-h bn-count-colon" style={colon}>
               :
             </span>
             <div style={{ textAlign: "center" }}>
-              <div style={card}>
-                <span className="bn-h" style={digit}>
+              <div className="bn-count-card" style={card}>
+                <span className="bn-h bn-count-digit" style={digit}>
                   {t.hours}
                 </span>
               </div>
               <div style={caption}>часов</div>
             </div>
-            <span className="bn-h" style={colon}>
+            <span className="bn-h bn-count-colon" style={colon}>
               :
             </span>
             <div style={{ textAlign: "center" }}>
-              <div style={card}>
-                <span className="bn-h" style={digit}>
+              <div className="bn-count-card" style={card}>
+                <span className="bn-h bn-count-digit" style={digit}>
                   {t.mins}
                 </span>
               </div>
               <div style={caption}>минут</div>
             </div>
-            <span className="bn-h" style={colon}>
+            <span className="bn-h bn-count-colon" style={colon}>
               :
             </span>
             <div style={{ textAlign: "center" }}>
-              <div style={{ ...card, animation: "bnring 1s ease-out infinite" }}>
+              <div className="bn-count-card" style={{ ...card, animation: "bnring 1s ease-out infinite" }}>
                 <span
                   key={t.secs}
-                  className="bn-h"
+                  className="bn-h bn-count-digit"
                   style={{ display: "inline-block", ...digit, color: "var(--accent)", animation: "bntick .5s ease-out" }}
                 >
                   {t.secs}

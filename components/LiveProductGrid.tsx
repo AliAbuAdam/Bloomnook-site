@@ -43,8 +43,11 @@ export default function LiveProductGrid({
 
   const shown = limit ? items.slice(0, limit) : items;
 
+  // Responsive column rules live in globals.css; pick the matching class.
+  const gridClass = columns >= 4 ? "bn-g-prod4" : columns === 3 ? "bn-g-prod3" : "";
+
   return (
-    <div style={{ display: "grid", gridTemplateColumns: `repeat(${columns},1fr)`, gap }}>
+    <div className={gridClass} style={{ display: "grid", gridTemplateColumns: `repeat(${columns},1fr)`, gap }}>
       {shown.map((item) => (
         <ProductCard key={item.id} item={item} showHeart={showHeart} showButton={showButton} />
       ))}

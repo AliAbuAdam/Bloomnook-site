@@ -26,6 +26,7 @@ export default function Home() {
       {/* HERO */}
       <section style={{ background: "linear-gradient(180deg,var(--sage-2),#fff)" }}>
         <div
+          className="bn-pad bn-stack"
           style={{
             maxWidth: 1240,
             margin: "0 auto",
@@ -56,7 +57,7 @@ export default function Home() {
               <Leaf size={15} strokeWidth={1.8} />
               Луковицы цветов с доставкой
             </span>
-            <h1 className="bn-h" style={{ fontSize: 62, lineHeight: 1.04, fontWeight: 600, margin: "22px 0 0", color: "var(--ink)" }}>
+            <h1 className="bn-h" style={{ fontSize: "clamp(36px, 8vw, 62px)", lineHeight: 1.04, fontWeight: 600, margin: "22px 0 0", color: "var(--ink)" }}>
               Сад начинается
               <br />с хорошей <span style={{ color: "var(--accent)", fontStyle: "italic" }}>луковицы</span>
             </h1>
@@ -116,7 +117,7 @@ export default function Home() {
           </div>
 
           {/* hero visual */}
-          <div style={{ position: "relative" }}>
+          <div className="bn-hero-visual" style={{ position: "relative" }}>
             <div
               style={{
                 background: "var(--sage)",
@@ -134,6 +135,7 @@ export default function Home() {
               <Motif href="#m-tulip" strokeWidth={2.2} style={{ width: "54%", position: "relative" }} />
             </div>
             <div
+              className="bn-hero-badge-l"
               style={{
                 position: "absolute",
                 top: 26,
@@ -168,6 +170,7 @@ export default function Home() {
               </div>
             </div>
             <div
+              className="bn-hero-badge-r"
               style={{
                 position: "absolute",
                 bottom: 26,
@@ -206,14 +209,14 @@ export default function Home() {
       </section>
 
       {/* CATEGORIES */}
-      <section id="cats" style={{ maxWidth: 1240, margin: "0 auto", padding: "88px 32px 24px" }}>
+      <section id="cats" className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "88px 32px 24px" }}>
         <div style={{ textAlign: "center", marginBottom: 44 }}>
           <span style={eyebrow}>Каталог</span>
-          <h2 className="bn-h" style={{ fontSize: 42, fontWeight: 600, margin: "10px 0 0" }}>
+          <h2 className="bn-h" style={{ fontSize: "clamp(28px, 4.6vw, 42px)", fontWeight: 600, margin: "10px 0 0" }}>
             Категории <span style={{ color: "var(--accent)", fontStyle: "italic" }}>луковиц</span>
           </h2>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 18 }}>
+        <div className="bn-g-cats" style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 18 }}>
           {categories.map((cat) => (
             <Link
               key={cat.name}
@@ -241,11 +244,11 @@ export default function Home() {
       </section>
 
       {/* BESTSELLERS */}
-      <section style={{ maxWidth: 1240, margin: "0 auto", padding: "64px 32px 24px" }}>
-        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 36 }}>
+      <section className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "64px 32px 24px" }}>
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 36, gap: 16, flexWrap: "wrap" }}>
           <div>
             <span style={eyebrow}>Популярное</span>
-            <h2 className="bn-h" style={{ fontSize: 42, fontWeight: 600, margin: "10px 0 0" }}>
+            <h2 className="bn-h" style={{ fontSize: "clamp(28px, 4.6vw, 42px)", fontWeight: 600, margin: "10px 0 0" }}>
               Хиты <span style={{ color: "var(--accent)", fontStyle: "italic" }}>сезона</span>
             </h2>
           </div>
@@ -276,14 +279,14 @@ export default function Home() {
       <SeasonalPromo />
 
       {/* HOW IT WORKS */}
-      <section id="steps" style={{ maxWidth: 1240, margin: "0 auto", padding: "64px 32px" }}>
+      <section id="steps" className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "64px 32px" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <span style={eyebrow}>Как это работает</span>
-          <h2 className="bn-h" style={{ fontSize: 42, fontWeight: 600, margin: "10px 0 0" }}>
+          <h2 className="bn-h" style={{ fontSize: "clamp(28px, 4.6vw, 42px)", fontWeight: 600, margin: "10px 0 0" }}>
             От заказа до <span style={{ color: "var(--accent)", fontStyle: "italic" }}>цветения</span>
           </h2>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 24 }}>
+        <div className="bn-g-steps" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 24 }}>
           {steps.map((s) => (
             <div key={s.n} style={{ position: "relative", paddingTop: 8 }}>
               <div className="bn-h" style={{ fontSize: 54, fontWeight: 600, color: "var(--sage)", lineHeight: 1 }}>
@@ -302,6 +305,7 @@ export default function Home() {
         style={{ background: "var(--sage-2)", borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)" }}
       >
         <div
+          className="bn-pad bn-g-3"
           style={{
             maxWidth: 1240,
             margin: "0 auto",
@@ -339,14 +343,14 @@ export default function Home() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section id="reviews" style={{ maxWidth: 1240, margin: "0 auto", padding: "88px 32px" }}>
+      <section id="reviews" className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "88px 32px" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <span style={eyebrow}>Отзывы</span>
-          <h2 className="bn-h" style={{ fontSize: 42, fontWeight: 600, margin: "10px 0 0" }}>
+          <h2 className="bn-h" style={{ fontSize: "clamp(28px, 4.6vw, 42px)", fontWeight: 600, margin: "10px 0 0" }}>
             Что говорят <span style={{ color: "var(--accent)", fontStyle: "italic" }}>садоводы</span>
           </h2>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24 }}>
+        <div className="bn-g-3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24 }}>
           {testimonials.map((t) => (
             <div
               key={t.name}
@@ -395,6 +399,7 @@ export default function Home() {
       {/* FAQ */}
       <section id="faq" style={{ background: "var(--sage-2)", borderTop: "1px solid var(--line)" }}>
         <div
+          className="bn-pad bn-stack-md"
           style={{
             maxWidth: 1240,
             margin: "0 auto",
@@ -407,7 +412,7 @@ export default function Home() {
         >
           <div>
             <span style={eyebrow}>FAQ</span>
-            <h2 className="bn-h" style={{ fontSize: 42, fontWeight: 600, margin: "10px 0 32px" }}>
+            <h2 className="bn-h" style={{ fontSize: "clamp(28px, 4.6vw, 42px)", fontWeight: 600, margin: "10px 0 32px" }}>
               Частые <span style={{ color: "var(--accent)", fontStyle: "italic" }}>вопросы</span>
             </h2>
             <Faq />
@@ -457,9 +462,9 @@ export default function Home() {
 
       {/* NEWSLETTER */}
       <section style={{ background: "#fff" }}>
-        <div style={{ maxWidth: 760, margin: "0 auto", padding: "88px 32px", textAlign: "center" }}>
+        <div className="bn-pad" style={{ maxWidth: 760, margin: "0 auto", padding: "88px 32px", textAlign: "center" }}>
           <span style={eyebrow}>Рассылка</span>
-          <h2 className="bn-h" style={{ fontSize: 38, fontWeight: 600, margin: "12px 0 12px", lineHeight: 1.15 }}>
+          <h2 className="bn-h" style={{ fontSize: "clamp(26px, 5vw, 38px)", fontWeight: 600, margin: "12px 0 12px", lineHeight: 1.15 }}>
             Подпишитесь и получите <span style={{ color: "var(--accent)", fontStyle: "italic" }}>−10%</span> на первый заказ
           </h2>
           <p style={{ fontSize: 16, color: "var(--muted)", margin: "0 0 30px" }}>

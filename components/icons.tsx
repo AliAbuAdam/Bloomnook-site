@@ -177,6 +177,14 @@ export function Lock({ size = 15, strokeWidth = 1.6, style }: IconProps) {
   );
 }
 
+export function Menu({ size = 22, strokeWidth = 1.9, style }: IconProps) {
+  return (
+    <svg {...strokeProps(size, strokeWidth, style)}>
+      <path d="M4 7h16M4 12h16M4 17h16" />
+    </svg>
+  );
+}
+
 export function Close({ size = 18, strokeWidth = 1.9, style }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" style={{ width: size, height: size, fill: "none", stroke: "currentColor", strokeWidth, strokeLinecap: "round", ...style }}>

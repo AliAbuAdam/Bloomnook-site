@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import ProductCard from "./ProductCard";
-import { Check, ChevronDown, ChevronLeft, ChevronRight } from "./icons";
+import { Check, ChevronDown, ChevronLeft, ChevronRight, Close, Menu } from "./icons";
 import { fetchDisplayProducts } from "@/lib/products";
 import { BLOOM_MONTHS, money, type Product, type Season } from "@/lib/data";
 
@@ -92,6 +92,15 @@ export default function ShopBrowser({ fallback }: { fallback: Product[] }) {
   const [sort, setSort] = useState<SortValue>("popular");
   const [sortOpen, setSortOpen] = useState(false);
   const [page, setPage] = useState(1);
+  // Mobile/tablet: filters live in a slide-in panel.
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = filtersOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [filtersOpen]);
 
   useEffect(() => {
     let alive = true;
@@ -169,6 +178,7 @@ export default function ShopBrowser({ fallback }: { fallback: Product[] }) {
 
   return (
     <div
+      className="bn-pad bn-shop-grid"
       style={{
         maxWidth: 1240,
         margin: "0 auto",
@@ -179,8 +189,28 @@ export default function ShopBrowser({ fallback }: { fallback: Product[] }) {
         alignItems: "start",
       }}
     >
+      {/* backdrop for the mobile filter panel */}
+      <div
+        className={`bn-drawer-backdrop${filtersOpen ? " open" : ""}`}
+        onClick={() => setFiltersOpen(false)}
+        aria-hidden={!filtersOpen}
+      />
+
       {/* filters */}
-      <aside style={{ position: "sticky", top: 96, display: "flex", flexDirection: "column", gap: 30 }}>
+      <aside
+        className={`bn-filters${filtersOpen ? " open" : ""}`}
+        style={{ position: "sticky", top: 96, display: "flex", flexDirection: "column", gap: 30 }}
+      >
+        <div className="bn-filter-close" style={{ alignItems: "center", justifyContent: "space-between" }}>
+          <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>Фильтры</h3>
+          <button
+            onClick={() => setFiltersOpen(false)}
+            aria-label="Закрыть фильтры"
+            style={{ border: "none", background: "none", padding: 6, cursor: "pointer", color: "var(--ink)" }}
+          >
+            <Close size={22} />
+          </button>
+        </div>
         <div>
           <h3 style={filterGroupTitle}>Тип цветка</h3>
           <div style={filterList}>
@@ -285,6 +315,24 @@ export default function ShopBrowser({ fallback }: { fallback: Product[] }) {
       {/* grid */}
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, gap: 16, flexWrap: "wrap" }}>
+          <button
+            className="bn-filter-toggle"
+            onClick={() => setFiltersOpen(true)}
+            style={{
+              alignItems: "center",
+              gap: 8,
+              border: "1.5px solid var(--line)",
+              background: "#fff",
+              borderRadius: 999,
+              padding: "9px 16px",
+              fontWeight: 700,
+              fontSize: 14,
+              color: "var(--ink)",
+              cursor: "pointer",
+            }}
+          >
+            <Menu size={18} /> Фильтры
+          </button>
           <span style={{ fontSize: 14, color: "var(--muted)" }}>{countLabel}</span>
           <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, position: "relative" }}>
             <span style={{ color: "var(--muted)" }}>Сортировка:</span>
@@ -343,7 +391,7 @@ export default function ShopBrowser({ fallback }: { fallback: Product[] }) {
         </div>
 
         {shown.length ? (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 22 }}>
+          <div className="bn-g-prod3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 22 }}>
             {shown.map((item) => (
               <ProductCard key={item.id} item={item} showHeart showButton />
             ))}
