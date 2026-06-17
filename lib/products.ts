@@ -35,7 +35,21 @@ export interface ProductInput {
   zone: string; // зона USDA
   color: string; // особенности окраски и формы
   usage: string; // применение
+  packs: number[]; // комплекты (шт в наборе), напр. [3, 5, 10]; [] — только поштучно
   order: number;
+}
+
+/**
+ * Привести список комплектов к чистому виду: целые положительные числа,
+ * без дублей и без «1» (поштучная продажа добавляется на витрине сама),
+ * в порядке возрастания.
+ */
+export function normalizePacks(raw: unknown): number[] {
+  const arr = Array.isArray(raw) ? raw : [];
+  const nums = arr
+    .map((v) => Math.floor(Number(v)))
+    .filter((n) => Number.isFinite(n) && n > 1);
+  return Array.from(new Set(nums)).sort((a, b) => a - b);
 }
 
 /** A stored product with its Firestore document id. */
@@ -75,6 +89,7 @@ export function toDisplayProduct(p: AdminProduct, index: number): Product {
     price: p.price ? money(p.price) : "Цена по запросу",
     priceValue: p.price,
     old: p.old ? money(p.old) : null,
+    oldValue: p.old,
     disc: p.disc ? discount(p.disc) : null,
     hasDisc: !!p.disc,
     rating: p.rating.toFixed(1),
@@ -90,6 +105,7 @@ export function toDisplayProduct(p: AdminProduct, index: number): Product {
     zone: p.zone,
     color: p.color,
     usage: p.usage,
+    packs: normalizePacks(p.packs),
     tile: TILE_TINTS[index % 2],
   };
 }
@@ -116,6 +132,7 @@ export function emptyProduct(order: number): ProductInput {
     zone: "",
     color: "",
     usage: "",
+    packs: [],
     order,
   };
 }
@@ -141,6 +158,7 @@ function inputFromDoc(data: Record<string, unknown>): ProductInput {
     zone: String(data.zone ?? ""),
     color: String(data.color ?? ""),
     usage: String(data.usage ?? ""),
+    packs: normalizePacks(data.packs),
     order: Number(data.order ?? 0),
   };
 }
@@ -163,7 +181,7 @@ export async function fetchDisplayProducts(): Promise<Product[]> {
  */
 function withNormalizedImages(input: ProductInput): ProductInput {
   const images = normalizeImages(input.images, input.image);
-  return { ...input, images, image: images[0] ?? "" };
+  return { ...input, images, image: images[0] ?? "", packs: normalizePacks(input.packs) };
 }
 
 export async function addProduct(input: ProductInput): Promise<void> {
@@ -235,6 +253,7 @@ function rawToInput(p: (typeof RAW_PRODUCTS)[number], order: number): ProductInp
     zone: p.zone,
     color: p.color,
     usage: p.usage,
+    packs: [],
     order,
   };
 }

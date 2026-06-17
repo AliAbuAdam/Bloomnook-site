@@ -104,10 +104,18 @@ export default function ProductCard({
         )}
         <div style={{ display: "flex", alignItems: "baseline", gap: 9, marginTop: 2 }}>
           <span style={{ fontSize: 18, fontWeight: 800, color: "var(--ink)" }}>{item.price}</span>
+          {item.priceValue > 0 && item.packs.length > 0 && (
+            <span style={{ fontSize: 12.5, color: "var(--muted)" }}>/ шт</span>
+          )}
           {item.old && (
             <span style={{ fontSize: 14, color: "#aab3a8", textDecoration: "line-through" }}>{item.old}</span>
           )}
         </div>
+        {item.packs.length > 0 && (
+          <span style={{ fontSize: 12, color: "var(--green-3)", fontWeight: 600 }}>
+            Комплекты: {item.packs.join(" · ")} шт
+          </span>
+        )}
         {showButton && (
           <span
             className="bn-hover-fade"

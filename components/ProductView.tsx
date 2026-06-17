@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import Motif from "./Motif";
 import { Star, Heart, Truck, Minus, Plus, Check } from "./icons";
 import { fetchDisplayProductById } from "@/lib/products";
-import type { Product, Season } from "@/lib/data";
+import { money, type Product, type Season } from "@/lib/data";
 
 const SEASON_LABEL: Record<Season, string> = {
   autumn: "Осенняя посадка (сентябрь — октябрь)",
@@ -33,12 +33,16 @@ export default function ProductView() {
   const [loading, setLoading] = useState(true);
   const [gallery, setGallery] = useState(0);
   const [qty, setQty] = useState(1);
+  // Выбранная фасовка — число штук в одном комплекте. 1 — поштучно.
+  const [pack, setPack] = useState(1);
   const [tab, setTab] = useState(0);
 
   useEffect(() => {
     let alive = true;
     setLoading(true);
     setGallery(0);
+    setQty(1);
+    setPack(1);
     if (!id) {
       setProduct(null);
       setLoading(false);
@@ -117,6 +121,18 @@ export default function ProductView() {
   const hasPhotos = p.images.length > 0;
   const mainPhoto = hasPhotos ? p.images[Math.min(gallery, p.images.length - 1)] : null;
   const specRows = specs(p);
+
+  // Фасовка: поштучно (1) всегда первой, далее комплекты из карточки.
+  const packOptions = [1, ...p.packs];
+  // Защита от устаревшего выбора после смены товара.
+  const activePack = packOptions.includes(pack) ? pack : 1;
+  const hasPrice = p.priceValue > 0;
+  // Цена линейна: комплект из N шт = цена за шт × N. Поэтому N шт поштучно
+  // и один комплект из N шт стоят одинаково.
+  const pricePerPack = p.priceValue * activePack;
+  const oldPerPack = p.oldValue * activePack;
+  const totalPieces = activePack * qty;
+  const total = pricePerPack * qty;
 
   return (
     <>
@@ -229,10 +245,21 @@ export default function ProductView() {
             </span>
             <span style={{ fontSize: 14, color: "var(--muted)" }}>{p.rating}</span>
           </div>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 18 }}>
-            <span style={{ fontSize: 30, fontWeight: 800 }}>{p.price}</span>
-            {p.old && (
-              <span style={{ fontSize: 18, color: "#aab3a8", textDecoration: "line-through" }}>{p.old}</span>
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
+              <span style={{ fontSize: 30, fontWeight: 800 }}>
+                {hasPrice ? money(pricePerPack) : p.price}
+              </span>
+              {hasPrice && p.oldValue > 0 && (
+                <span style={{ fontSize: 18, color: "#aab3a8", textDecoration: "line-through" }}>
+                  {money(oldPerPack)}
+                </span>
+              )}
+            </div>
+            {hasPrice && activePack > 1 && (
+              <div style={{ fontSize: 13.5, color: "var(--muted)", marginTop: 4 }}>
+                за комплект ({activePack} шт) · {money(p.priceValue)} за шт
+              </div>
             )}
           </div>
           {p.color && (
@@ -269,7 +296,51 @@ export default function ProductView() {
             </div>
           )}
 
-          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
+          {packOptions.length > 1 && (
+            <div style={{ marginBottom: 18 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>Фасовка</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                {packOptions.map((n) => {
+                  const selected = n === activePack;
+                  return (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => {
+                        setPack(n);
+                        setQty(1);
+                      }}
+                      aria-pressed={selected}
+                      style={{
+                        border: selected ? "1.5px solid var(--accent)" : "1.5px solid var(--line)",
+                        background: selected ? "var(--sage)" : "#fff",
+                        color: "var(--ink)",
+                        borderRadius: 14,
+                        padding: "9px 16px",
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                        textAlign: "left",
+                        minWidth: 96,
+                      }}
+                    >
+                      <div style={{ fontWeight: 700, fontSize: 14.5 }}>{n === 1 ? "Поштучно" : `${n} шт`}</div>
+                      {hasPrice && (
+                        <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 2 }}>
+                          {money(p.priceValue * n)}
+                          {n > 1 ? " / компл." : " / шт"}
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>
+            {activePack > 1 ? "Количество комплектов" : "Количество"}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
             <div style={{ display: "flex", alignItems: "center", border: "1.5px solid var(--line)", borderRadius: 999, overflow: "hidden" }}>
               <button
                 onClick={() => setQty((q) => Math.max(1, q - 1))}
@@ -326,6 +397,14 @@ export default function ProductView() {
               <Heart size={20} />
             </button>
           </div>
+          {hasPrice && totalPieces > 1 && (
+            <div style={{ fontSize: 14.5, marginBottom: 18 }}>
+              {activePack > 1 && (
+                <span style={{ color: "var(--muted)" }}>Всего {totalPieces} шт · </span>
+              )}
+              <b>Итого: {money(total)}</b>
+            </div>
+          )}
           <div
             style={{
               display: "flex",

@@ -75,6 +75,96 @@ function NumField({
   );
 }
 
+/**
+ * Редактор комплектов (фасовки): админ задаёт, сколько штук в наборе.
+ * Числа вводятся через поле (можно сразу несколько: «3, 5, 10»), добавляются
+ * по Enter или кнопкой. Поштучная продажа (1 шт) доступна всегда — её добавлять
+ * не нужно. Кол-во комплектов не ограничено.
+ */
+function PacksField({ value, onChange }: { value: number[]; onChange: (next: number[]) => void }) {
+  const [text, setText] = useState("");
+
+  function commit() {
+    const parsed = text
+      .split(/[^\d]+/)
+      .map((s) => parseInt(s, 10))
+      .filter((n) => Number.isFinite(n) && n > 1);
+    if (parsed.length) {
+      const merged = Array.from(new Set([...value, ...parsed])).sort((a, b) => a - b);
+      onChange(merged);
+    }
+    setText("");
+  }
+
+  function remove(n: number) {
+    onChange(value.filter((v) => v !== n));
+  }
+
+  const chip: React.CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 7,
+    background: "#fff",
+    border: "1.5px solid var(--line)",
+    borderRadius: 999,
+    padding: "7px 8px 7px 14px",
+    fontSize: 13.5,
+    fontWeight: 700,
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: value.length ? 10 : 0 }}>
+        <span style={{ ...chip, background: "var(--sage)", borderColor: "#cfe0c6", color: "var(--green)", paddingRight: 14 }}>
+          1 шт · поштучно
+        </span>
+        {value.map((n) => (
+          <span key={n} style={chip}>
+            {n} шт
+            <button
+              type="button"
+              onClick={() => remove(n)}
+              aria-label={`Убрать комплект ${n} шт`}
+              style={{
+                width: 20,
+                height: 20,
+                border: "none",
+                background: "var(--sage)",
+                color: "var(--muted)",
+                borderRadius: "50%",
+                cursor: "pointer",
+                fontSize: 14,
+                lineHeight: "20px",
+                padding: 0,
+              }}
+            >
+              ×
+            </button>
+          </span>
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: 8 }}>
+        <input
+          style={{ ...input, maxWidth: 200 }}
+          inputMode="numeric"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              commit();
+            }
+          }}
+          placeholder="напр. 3, 5, 10"
+        />
+        <button type="button" style={{ ...ghostBtn, padding: "10px 18px" }} onClick={commit}>
+          Добавить
+        </button>
+      </div>
+    </div>
+  );
+}
+
 const primaryBtn: React.CSSProperties = {
   border: "none",
   background: "var(--accent)",
@@ -620,6 +710,15 @@ export default function AdminPage() {
               <label htmlFor="inStock" style={{ fontSize: 14, fontWeight: 600 }}>
                 В наличии
               </label>
+            </div>
+            <div style={{ gridColumn: "span 3" }}>
+              <label style={label}>
+                Комплекты{" "}
+                <span style={{ fontWeight: 400, color: "var(--muted)" }}>
+                  — сколько штук в наборе. Цена комплекта = цена за шт × количество. Поштучно — всегда.
+                </span>
+              </label>
+              <PacksField value={form.packs} onChange={(next) => setField("packs", next)} />
             </div>
             <div style={{ gridColumn: "span 3", height: 1, background: "var(--line)", margin: "4px 0" }} />
             <div>

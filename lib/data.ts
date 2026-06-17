@@ -54,6 +54,7 @@ export interface Product {
   price: string;
   priceValue: number;
   old: string | null;
+  oldValue: number;
   disc: string | null;
   hasDisc: boolean;
   rating: string;
@@ -69,6 +70,12 @@ export interface Product {
   zone: string;
   color: string;
   usage: string;
+  /**
+   * Доступные комплекты (фасовка) — число штук в наборе. Цена линейна:
+   * комплект из N шт стоит `priceValue × N`. Поштучная продажа (1 шт)
+   * доступна всегда и добавляется на витрине автоматически. [] — только поштучно.
+   */
+  packs: number[];
   tile: string;
 }
 
@@ -130,6 +137,7 @@ export const products: Product[] = RAW_PRODUCTS.map((p, i) => {
   price: p.price ? money(p.price) : "Цена по запросу",
   priceValue: p.price,
   old: p.old ? money(p.old) : null,
+  oldValue: p.old,
   disc: p.disc ? discount(p.disc) : null,
   hasDisc: !!p.disc,
   rating: p.rating.toFixed(1),
@@ -145,6 +153,7 @@ export const products: Product[] = RAW_PRODUCTS.map((p, i) => {
   zone: p.zone,
   color: p.color,
   usage: p.usage,
+  packs: [],
   tile: TILE_TINTS[i % 2],
   };
 });
