@@ -1,5 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import Motif from "@/components/Motif";
+import heroTulip from "@/public/hero-tulip.jpg";
 import LiveProductGrid from "@/components/LiveProductGrid";
 import SeasonalPromo from "@/components/SeasonalPromo";
 import Faq from "@/components/Faq";
@@ -132,8 +134,14 @@ export default function Home() {
                 position: "relative",
               }}
             >
-              <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 50% 38%,#fff,transparent 60%)" }} />
-              <Motif href="#m-tulip" strokeWidth={2.2} style={{ width: "54%", position: "relative" }} />
+              <Image
+                src={heroTulip}
+                alt="Белый махровый тюльпан"
+                fill
+                sizes="(max-width: 900px) 340px, 50vw"
+                style={{ objectFit: "cover" }}
+                priority
+              />
             </div>
             <div
               className="bn-hero-badge-l"
