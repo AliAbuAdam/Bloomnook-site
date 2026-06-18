@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import headerLogo from "@/public/header_logo.svg";
 import { Search, Heart, Cart, User, Menu, Close } from "./icons";
 
 const navLink: React.CSSProperties = {
@@ -73,7 +74,7 @@ export default function Header() {
         }}
       >
         <Link href="/" style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
-          <Image src="/header_logo.svg" alt="Bloom Nook" width={105} height={40} style={{ height: 40, width: "auto" }} priority />
+          <Image src={headerLogo} alt="Bloom Nook" width={105} height={40} style={{ height: 40, width: "auto" }} priority />
         </Link>
         <nav className="bn-nav-desktop" style={{ display: "flex", alignItems: "center", gap: 30, fontSize: 15, fontWeight: 600 }}>
           {navItems.map((n) => (
@@ -120,7 +121,7 @@ export default function Header() {
     <div className={`bn-drawer-backdrop${open ? " open" : ""}`} onClick={() => setOpen(false)} aria-hidden={!open} />
       <aside className={`bn-drawer${open ? " open" : ""}`} aria-hidden={!open}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 26 }}>
-          <Image src="/header_logo.svg" alt="Bloom Nook" width={96} height={36} style={{ height: 36, width: "auto" }} />
+          <Image src={headerLogo} alt="Bloom Nook" width={96} height={36} style={{ height: 36, width: "auto" }} />
           <button
             onClick={() => setOpen(false)}
             aria-label="Закрыть меню"

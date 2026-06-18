@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import footerLogo from "@/public/footer_logo.svg";
 import { Telegram, Yandex } from "./icons";
 
 const social: React.CSSProperties = {
@@ -24,7 +25,7 @@ export default function Footer() {
       <div className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "64px 32px 28px" }}>
         <div className="bn-footer-grid" style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr 1fr 1.2fr", gap: 40 }}>
           <div>
-            <Image src="/footer_logo.svg" alt="Bloom Nook" width={116} height={44} style={{ height: 44, width: "auto", marginBottom: 18 }} />
+            <Image src={footerLogo} alt="Bloom Nook" width={116} height={44} style={{ height: 44, width: "auto", marginBottom: 18 }} />
             <p style={{ fontSize: 14, lineHeight: 1.7, opacity: 0.8, margin: "0 0 22px", maxWidth: 300 }}>
               Отборные луковицы цветов с доставкой по всей России через Ozon. Сажайте сейчас — цветите весной.
             </p>
