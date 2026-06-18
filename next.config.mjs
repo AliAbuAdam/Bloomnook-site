@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-};
-
-export default nextConfig;
+  const basePath = process.env.PAGES_BASE_PATH || "";
+  const nextConfig = {
+    reactStrictMode: true,
+    output: "export",
+    images: { unoptimized: true },
+    trailingSlash: true,
+    basePath,
+    assetPrefix: basePath ? basePath + "/" : undefined,
+  };
+  export default nextConfig;
