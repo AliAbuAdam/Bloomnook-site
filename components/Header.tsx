@@ -78,27 +78,27 @@ export default function Header() {
         </Link>
         <nav className="bn-nav-desktop" style={{ display: "flex", alignItems: "center", gap: 30, fontSize: 15, fontWeight: 600 }}>
           {navItems.map((n) => (
-            <Link key={n.label} href={n.href} style={navLink}>
+            <Link key={n.label} href={n.href} className="bn-navlink" style={navLink}>
               {n.label}
             </Link>
           ))}
         </nav>
         <div style={{ display: "flex", alignItems: "center", gap: 18, color: "var(--ink)" }}>
-          <span className="bn-hide-xs" style={{ display: "flex", cursor: "pointer" }}>
+          <span className="bn-hide-xs bn-icon-btn" style={{ display: "flex", cursor: "pointer" }}>
             <Search />
           </span>
-          <span className="bn-hide-xs" style={{ display: "flex", cursor: "pointer" }}>
+          <span className="bn-hide-xs bn-icon-btn" style={{ display: "flex", cursor: "pointer" }}>
             <Heart />
           </span>
-          <Link href="/cart" style={{ cursor: "pointer", position: "relative", color: "var(--ink)", display: "flex" }}>
+          <Link href="/cart" className="bn-icon-btn" style={{ cursor: "pointer", position: "relative", color: "var(--ink)", display: "flex" }}>
             <Cart />
             <span style={cartBadge}>4</span>
           </Link>
-          <span className="bn-hide-xs" style={{ display: "flex", cursor: "pointer" }}>
+          <span className="bn-hide-xs bn-icon-btn" style={{ display: "flex", cursor: "pointer" }}>
             <User />
           </span>
           <button
-            className="bn-burger"
+            className="bn-burger bn-icon-btn"
             onClick={() => setOpen(true)}
             aria-label="Открыть меню"
             style={{
@@ -136,6 +136,7 @@ export default function Header() {
               key={n.label}
               href={n.href}
               onClick={() => setOpen(false)}
+              className="bn-drawer-link"
               style={{ ...navLink, padding: "12px 0", borderBottom: "1px solid var(--line)" }}
             >
               {n.label}

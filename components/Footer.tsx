@@ -17,7 +17,7 @@ const social: React.CSSProperties = {
 
 const colLink: React.CSSProperties = { cursor: "pointer", color: "#fff", textDecoration: "none" };
 const colTitle: React.CSSProperties = { fontSize: 15, fontWeight: 800, margin: "0 0 16px" };
-const colList: React.CSSProperties = { display: "flex", flexDirection: "column", gap: 11, fontSize: 14, opacity: 0.82 };
+const colList: React.CSSProperties = { display: "flex", flexDirection: "column", gap: 11, fontSize: 14 };
 
 export default function Footer() {
   return (
@@ -30,13 +30,13 @@ export default function Footer() {
               Отборные луковицы цветов с доставкой по всей России через Ozon. Сажайте сейчас — цветите весной.
             </p>
             <div style={{ display: "flex", gap: 10 }}>
-              <a href="#" style={{ ...social, fontSize: 12, fontWeight: 700 }}>
+              <a href="#" className="bn-social" style={{ ...social, fontSize: 12, fontWeight: 700 }}>
                 VK
               </a>
-              <a href="#" style={social}>
+              <a href="#" className="bn-social" style={social}>
                 <Telegram size={17} />
               </a>
-              <a href="#" style={social}>
+              <a href="#" className="bn-social" style={social}>
                 <Yandex size={19} />
               </a>
             </div>
@@ -44,16 +44,16 @@ export default function Footer() {
           <div>
             <h4 style={colTitle}>Магазин</h4>
             <div style={colList}>
-              <Link href="/shop" style={colLink}>
+              <Link href="/shop" className="bn-foot-link" style={colLink}>
                 Все товары
               </Link>
-              <Link href="/#cats" style={colLink}>
+              <Link href="/#cats" className="bn-foot-link" style={colLink}>
                 Категории
               </Link>
-              <Link href="/shop" style={colLink}>
+              <Link href="/shop" className="bn-foot-link" style={colLink}>
                 Хиты сезона
               </Link>
-              <Link href="/shop" style={colLink}>
+              <Link href="/shop" className="bn-foot-link" style={colLink}>
                 Акции
               </Link>
             </div>
@@ -61,23 +61,23 @@ export default function Footer() {
           <div>
             <h4 style={colTitle}>Покупателю</h4>
             <div style={colList}>
-              <Link href="/#steps" style={colLink}>
+              <Link href="/#steps" className="bn-foot-link" style={colLink}>
                 Как заказать
               </Link>
-              <a href="#" style={{ color: "#fff", textDecoration: "none" }}>
+              <a href="#" className="bn-foot-link" style={colLink}>
                 Доставка через Ozon
               </a>
-              <a href="#" style={{ color: "#fff", textDecoration: "none" }}>
+              <a href="#" className="bn-foot-link" style={colLink}>
                 Гарантия свежести
               </a>
-              <Link href="/#faq" style={colLink}>
+              <Link href="/#faq" className="bn-foot-link" style={colLink}>
                 Вопросы и ответы
               </Link>
             </div>
           </div>
           <div>
             <h4 style={colTitle}>Контакты</h4>
-            <div style={colList}>
+            <div style={{ ...colList, opacity: 0.82 }}>
               <span>+7 495 000-00-00</span>
               <span>hello@bloomnook.ru</span>
               <span>Россия, доставка по всей стране</span>
@@ -98,10 +98,10 @@ export default function Footer() {
         >
           <span>© 2026 Bloom Nook. Все права защищены.</span>
           <span style={{ display: "flex", gap: 22 }}>
-            <a href="#" style={{ color: "#fff", textDecoration: "none" }}>
+            <a href="#" className="bn-foot-link" style={colLink}>
               Политика конфиденциальности
             </a>
-            <a href="#" style={{ color: "#fff", textDecoration: "none" }}>
+            <a href="#" className="bn-foot-link" style={colLink}>
               Оферта
             </a>
           </span>
