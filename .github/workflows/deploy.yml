@@ -55,12 +55,13 @@ jobs:
 
       - name: Build (static export)
         env:
-          # Сайт отдаётся по адресу <user>.github.io/<repo>/.
+          # Сайт отдаётся по адресу <user>.github.io/<repo>/, поэтому
+          # basePath = "/<repo>" (обязательно с ведущим слэшем).
           # Для custom domain позже установи PAGES_BASE_PATH: "" (пустая строка).
-          PAGES_BASE_PATH: ${{ github.event.repository.name }}
+          PAGES_BASE_PATH: /${{ github.event.repository.name }}
           # Конфиг Firebase. Значения публичные (попадают в бандл), хранятся
           # как Variables репозитория: Settings → Secrets and variables →
-          # Actions → вкладка Variables. Скопируй их из своего .env.local.
+          # Actions → вкладка Variables.
           NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
           NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
