@@ -5,6 +5,7 @@ import MotifSprite from "@/components/MotifSprite";
 import Announcement from "@/components/Announcement";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const playfair = Playfair_Display({
   subsets: ["latin", "cyrillic"],
@@ -36,12 +37,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ru" className={`${playfair.variable} ${manrope.variable}`}>
       <body>
         <MotifSprite />
-        <div style={{ background: "#fff", minHeight: "100vh" }}>
-          <Announcement />
-          <Header />
-          {children}
-          <Footer />
-        </div>
+        <AuthProvider>
+          <div style={{ background: "#fff", minHeight: "100vh" }}>
+            <Announcement />
+            <Header />
+            {children}
+            <Footer />
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );
