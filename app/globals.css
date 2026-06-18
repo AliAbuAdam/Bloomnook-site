@@ -23,7 +23,9 @@ body {
 }
 
 body {
-  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.02em; /* трекинг -2 */
   color: var(--ink);
   background: #fff;
   -webkit-font-smoothing: antialiased;
@@ -43,8 +45,8 @@ a {
 }
 
 .bn-h {
-  font-family: var(--font-playfair), Georgia, serif;
-  letter-spacing: -0.01em;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  letter-spacing: -0.02em; /* трекинг -2 */
 }
 
 /* ---- keyframes ---- */

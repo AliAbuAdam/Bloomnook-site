@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Playfair_Display, Manrope } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import MotifSprite from "@/components/MotifSprite";
 import Announcement from "@/components/Announcement";
@@ -7,17 +7,10 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/contexts/AuthContext";
 
-const playfair = Playfair_Display({
+const inter = Inter({
   subsets: ["latin", "cyrillic"],
-  weight: ["500", "600", "700"],
-  variable: "--font-playfair",
-  display: "swap",
-});
-
-const manrope = Manrope({
-  subsets: ["latin", "cyrillic"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-manrope",
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-inter",
   display: "swap",
 });
 
@@ -34,7 +27,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" className={`${playfair.variable} ${manrope.variable}`}>
+    <html lang="ru" className={inter.variable}>
       <body>
         <MotifSprite />
         <AuthProvider>
