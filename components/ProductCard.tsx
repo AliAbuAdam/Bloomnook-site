@@ -1,7 +1,11 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import Motif from "./Motif";
-import { Star, Heart } from "./icons";
+import { Star, Heart, Check } from "./icons";
 import type { Product } from "@/lib/data";
+import { useCart } from "@/contexts/CartContext";
 
 export default function ProductCard({
   item,
@@ -12,6 +16,19 @@ export default function ProductCard({
   showHeart?: boolean;
   showButton?: boolean;
 }) {
+  const { add } = useCart();
+  const [added, setAdded] = useState(false);
+
+  // Быстрое добавление с карточки — поштучно, 1 шт. Карточка обёрнута в ссылку,
+  // поэтому гасим переход и всплытие клика.
+  function handleAdd(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    add(item, 1, 1);
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 1600);
+  }
+
   return (
     <Link
       href={`/product?id=${item.id}`}
@@ -117,11 +134,14 @@ export default function ProductCard({
           </span>
         )}
         {showButton && (
-          <span
+          <button
+            onClick={handleAdd}
             className="bn-hover-fade"
             style={{
               marginTop: "auto",
-              background: "var(--accent)",
+              border: "none",
+              fontFamily: "inherit",
+              background: added ? "var(--green)" : "var(--accent)",
               color: "#fff",
               fontWeight: 700,
               fontSize: 14,
@@ -134,8 +154,9 @@ export default function ProductCard({
               gap: 8,
             }}
           >
-            Заказать на Ozon
-          </span>
+            {added ? <Check size={16} strokeWidth={2.4} /> : null}
+            {added ? "Добавлено" : "В корзину"}
+          </button>
         )}
       </div>
     </Link>

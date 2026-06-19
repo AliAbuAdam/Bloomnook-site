@@ -79,88 +79,6 @@ export interface Product {
   tile: string;
 }
 
-interface RawProduct {
-  id: number;
-  name: string;
-  lat: string;
-  cat: string;
-  motif: Motif;
-  image?: string;
-  images?: string[];
-  price: number;
-  old: number;
-  disc: number;
-  rating: number;
-  inStock: boolean;
-  season: Season;
-  cls: string;
-  height: string;
-  bloom: string;
-  depth: string;
-  zone: string;
-  color: string;
-  usage: string;
-}
-
-// Реальный каталог Bloom Nook. Цена / старая цена / скидка — заглушки (0),
-// проставляются в админке. Срок посадки выведен по группе: тюльпаны — осень,
-// лилии / гименокаллис / эукомис / кринум — весна.
-// Реальный каталог из таблицы. Цена / старая цена / скидка / наличие — пустые
-// (заполняются в админке). Все агро-характеристики — из таблицы.
-export const RAW_PRODUCTS: RawProduct[] = [
-  { id: 1, name: "Тюльпан «Лондон»", lat: "London", cat: "Тюльпан", motif: "tulip", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "autumn", cls: "Класс 5 (Дарвиновы гибриды)", height: "60–70", bloom: "Май (середина)", depth: "15–20", zone: "3–4", color: "Кроваво-красный с жёлтым дном, дно чёрно-коричневое", usage: "Срезка, группы" },
-  { id: 2, name: "Тюльпан «Айс Крим»", lat: "Ice Cream", cat: "Тюльпан", motif: "tulip", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "autumn", cls: "Класс 11 (Махровый поздний)", height: "35–40", bloom: "Май (конец)", depth: "10–12", zone: "4", color: "Белый центр в окружении розовых лепестков, похож на мороженое", usage: "Контейнеры, бордюры" },
-  { id: 3, name: "Тюльпан «Турмале»", lat: "Tourmalet", cat: "Тюльпан", motif: "tulip", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "autumn", cls: "Класс 7 (Бахромчатый)", height: "45–50", bloom: "Май", depth: "12–15", zone: "4", color: "Красный с ярко-жёлтой бахромой, бокал 7,5 см", usage: "Новинка 2022 года" },
-  { id: 4, name: "Тюльпан «Аспирант»", lat: "Aspirant", cat: "Тюльпан", motif: "tulip", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "autumn", cls: "Класс 3 (Триумф)", height: "50–55", bloom: "Май (начало)", depth: "15", zone: "3–4", color: "Красный с белой каймой, неприхотлив, сизая листва", usage: "Озеленение" },
-  { id: 5, name: "Тюльпан «Каньон»", lat: "Canyon", cat: "Тюльпан", motif: "tulip", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "autumn", cls: "Класс 11 (Махровый поздний)", height: "45", bloom: "Май (конец)", depth: "12", zone: "4", color: "Пурпурно-красный, почти чёрный в тени", usage: "Декор, срезка" },
-  { id: 6, name: "Лилия «Старгейзер»", lat: "Stargazer", cat: "Лилия", motif: "lily", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "spring", cls: "Восточный гибрид", height: "80–100", bloom: "Июль-Август", depth: "15–20", zone: "5", color: "Малиново-розовый с крапом, направлен вверх", usage: "Ароматные букеты" },
-  { id: 7, name: "Лилия «Аннамари Дрим»", lat: "Annemarie's Dream", cat: "Лилия", motif: "lily", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "spring", cls: "Азиатский гибрид", height: "70–80", bloom: "Июнь-Июль", depth: "15", zone: "3–4", color: "Махровая, белоснежная, без запаха и пыльцы", usage: "Аллергикам" },
-  { id: 8, name: "Лилия «Эприкот Фадж»", lat: "Apricot Fudge", cat: "Лилия", motif: "lily", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "spring", cls: "Азиатский гибрид", height: "60–70", bloom: "Июль", depth: "15", zone: "4", color: "Уникальная форма «розочки», абрикосовый цвет", usage: "Флористика" },
-  { id: 9, name: "Нарцисс «Пауэлла Альба»", lat: "Powellii Album", cat: "Нарцисс", motif: "narcissus", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "spring", cls: "Видовой / Кринум", height: "60–90", bloom: "Август", depth: "20", zone: "6–7", color: "Крупные белые колокольчатые цветы", usage: "Солитер, юг РФ" },
-  { id: 10, name: "Гименокаллис «Адванс»", lat: "Advance", cat: "Гименокаллис", motif: "narcissus", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "spring", cls: "Исмене (Ismene)", height: "45–60", bloom: "Июнь-Июль", depth: "10", zone: "8", color: "Белый, экзотический вид, аромат ванили", usage: "Контейнеры" },
-  { id: 11, name: "Эукомис «Биколор»", lat: "Bicolor", cat: "Эукомис", motif: "lily", price: 0, old: 0, disc: 0, rating: 4.8, inStock: true, season: "spring", cls: "Хохлатый лилейник", height: "30–60", bloom: "Июль-Август", depth: "12", zone: "7–8", color: "Зелёно-белый с пурпурной каймой, вид «ананаса»", usage: "Рокарии, кадки" },
-];
-
-const TILE_TINTS = ["#EEF3EA", "#F5F2E8"];
-
-export const products: Product[] = RAW_PRODUCTS.map((p, i) => {
-  const images = normalizeImages(p.images, p.image);
-  return {
-  id: p.id,
-  name: p.name,
-  lat: p.lat,
-  cat: p.cat,
-  motif: p.motif,
-  image: images[0] ?? "",
-  images,
-  useHref: "#m-" + p.motif,
-  price: p.price ? money(p.price) : "Цена по запросу",
-  priceValue: p.price,
-  old: p.old ? money(p.old) : null,
-  oldValue: p.old,
-  disc: p.disc ? discount(p.disc) : null,
-  hasDisc: !!p.disc,
-  rating: p.rating.toFixed(1),
-  ratingValue: p.rating,
-  inStock: p.inStock,
-  season: p.season,
-  cls: p.cls,
-  height: p.height,
-  heightCm: heightToCm(p.height),
-  bloom: p.bloom,
-  bloomMonths: bloomToMonths(p.bloom),
-  depth: p.depth,
-  zone: p.zone,
-  color: p.color,
-  usage: p.usage,
-  packs: [],
-  tile: TILE_TINTS[i % 2],
-  };
-});
-
-export const bestsellers = products.slice(0, 4);
-export const related = products.slice(5, 9);
-
 export interface Category {
   name: string;
   motif: Motif;
@@ -247,19 +165,3 @@ export const sizes: SizeOption[] = [
 export const productTabs = ["Описание", "Посадка и уход", "Отзывы"];
 
 export const galleryMotifs: Motif[] = ["tulip", "narcissus", "hyacinth", "crocus"];
-
-export interface CartItem {
-  name: string;
-  cat: string;
-  useHref: string;
-  price: string;
-  qty: number;
-  sub: string;
-}
-
-export const cart: CartItem[] = [
-  { name: "Тюльпан «Триумф», микс", cat: "Тюльпаны", useHref: "#m-tulip", price: "690 ₽", qty: 4, sub: "2" + NNBSP + "760 ₽" },
-  { name: "Нарцисс «Маунт Худ»", cat: "Нарциссы", useHref: "#m-narcissus", price: "540 ₽", qty: 2, sub: "1" + NNBSP + "080 ₽" },
-  { name: "Гиацинт «Дельфт Блю»", cat: "Гиацинты", useHref: "#m-hyacinth", price: "480 ₽", qty: 3, sub: "1" + NNBSP + "440 ₽" },
-  { name: "Лилия «Касабланка»", cat: "Лилии", useHref: "#m-lily", price: "920 ₽", qty: 1, sub: "920 ₽" },
-];

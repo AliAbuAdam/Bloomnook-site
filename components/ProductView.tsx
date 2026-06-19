@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import Motif from "./Motif";
-import { Star, Heart, Truck, Minus, Plus, Check } from "./icons";
+import { Star, Heart, Truck, Minus, Plus, Check, Cart } from "./icons";
 import { fetchDisplayProductById } from "@/lib/products";
 import { money, type Product, type Season } from "@/lib/data";
+import { useCart } from "@/contexts/CartContext";
 
 const SEASON_LABEL: Record<Season, string> = {
   autumn: "Осенняя посадка (сентябрь — октябрь)",
@@ -28,6 +29,7 @@ function specs(p: Product): { label: string; value: string }[] {
 export default function ProductView() {
   const params = useSearchParams();
   const id = params.get("id");
+  const { add } = useCart();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -36,6 +38,8 @@ export default function ProductView() {
   // Выбранная фасовка — число штук в одном комплекте. 1 — поштучно.
   const [pack, setPack] = useState(1);
   const [tab, setTab] = useState(0);
+  // Кратковременная отметка «Добавлено ✓» после клика по «В корзину».
+  const [added, setAdded] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -360,11 +364,16 @@ export default function ProductView() {
               </button>
             </div>
             <button
+              onClick={() => {
+                add(p, activePack, qty);
+                setAdded(true);
+                window.setTimeout(() => setAdded(false), 1600);
+              }}
               className="bn-hover-fade"
               style={{
                 flex: 1,
                 border: "none",
-                background: "var(--accent)",
+                background: added ? "var(--green)" : "var(--accent)",
                 color: "#fff",
                 fontWeight: 700,
                 fontSize: 16,
@@ -377,8 +386,8 @@ export default function ProductView() {
                 gap: 10,
               }}
             >
-              <Truck size={19} strokeWidth={1.8} />
-              Заказать на Ozon
+              {added ? <Check size={19} strokeWidth={2.4} /> : <Cart size={19} strokeWidth={1.8} />}
+              {added ? "Добавлено" : "В корзину"}
             </button>
             <button
               style={{
@@ -421,7 +430,7 @@ export default function ProductView() {
           >
             <Truck size={18} strokeWidth={1.7} style={{ stroke: "var(--green)", flex: "none" }} />
             <span>
-              <b>Доставка через Ozon</b> — оплата и доставка на стороне маркетплейса. Бесплатно по всей России.
+              <b>Бесплатная доставка</b> по всей России — с трекингом отправления и памяткой по посадке.
             </span>
           </div>
           <div style={{ fontSize: 13.5, color: "var(--muted)", lineHeight: 1.9 }}>

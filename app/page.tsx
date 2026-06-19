@@ -6,7 +6,7 @@ import LiveProductGrid from "@/components/LiveProductGrid";
 import SeasonalPromo from "@/components/SeasonalPromo";
 import Faq from "@/components/Faq";
 import { ArrowRight, Leaf, Star, Stars, Truck, Shield, Refresh } from "@/components/icons";
-import { categories, bestsellers, steps, benefits, testimonials } from "@/lib/data";
+import { categories, steps, benefits, testimonials } from "@/lib/data";
 
 const eyebrow: React.CSSProperties = {
   fontSize: 13,
@@ -281,7 +281,7 @@ export default function Home() {
             Смотреть все <ArrowRight size={16} strokeWidth={1.9} />
           </Link>
         </div>
-        <LiveProductGrid fallback={bestsellers} limit={4} columns={4} showHeart showButton />
+        <LiveProductGrid fallback={[]} limit={4} columns={4} showHeart showButton />
       </section>
 
       {/* SEASONAL PROMO */}

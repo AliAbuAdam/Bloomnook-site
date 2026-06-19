@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import ProductView from "@/components/ProductView";
 import LiveProductGrid from "@/components/LiveProductGrid";
-import { related } from "@/lib/data";
 
 export default function ProductPage() {
   return (
@@ -26,7 +25,7 @@ export default function ProductPage() {
             Вам также <span style={{ color: "var(--accent)", fontStyle: "italic" }}>понравится</span>
           </h2>
         </div>
-        <LiveProductGrid fallback={related} limit={4} columns={4} />
+        <LiveProductGrid fallback={[]} limit={4} columns={4} />
       </div>
     </main>
   );

@@ -16,7 +16,6 @@ import {
   addProduct,
   updateProduct,
   deleteProduct,
-  replaceCatalog,
   uploadProductImage,
   deleteProductImage,
   isAdminUser,
@@ -343,18 +342,6 @@ export default function AdminPage() {
     }
   }
 
-  async function handleReplace() {
-    if (!confirm("Удалить ВСЕ текущие товары и залить каталог из таблицы (11 позиций)? Действие необратимо.")) return;
-    try {
-      await replaceCatalog();
-      await load();
-    } catch (err) {
-      alert("Не удалось заменить каталог. Подробности в консоли.");
-      // eslint-disable-next-line no-console
-      console.error(err);
-    }
-  }
-
   function setField<K extends keyof ProductInput>(key: K, value: ProductInput[K]) {
     setForm((f) => (f ? { ...f, [key]: value } : f));
   }
@@ -482,9 +469,6 @@ export default function AdminPage() {
       <div style={{ display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap" }}>
         <button style={primaryBtn} onClick={openNew}>
           + Добавить товар
-        </button>
-        <button style={{ ...ghostBtn, borderColor: "#e6c3bb", color: "#9C3A26" }} onClick={handleReplace}>
-          Заменить каталог из таблицы (11)
         </button>
         <button style={ghostBtn} onClick={load}>
           Обновить

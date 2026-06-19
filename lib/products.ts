@@ -8,11 +8,10 @@ import {
   doc,
   query,
   orderBy,
-  writeBatch,
 } from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { db, storage } from "./firebase";
-import { money, discount, heightToCm, bloomToMonths, normalizeImages, RAW_PRODUCTS, type Motif, type Season, type Product } from "./data";
+import { money, discount, heightToCm, bloomToMonths, normalizeImages, type Motif, type Season, type Product } from "./data";
 
 /** Raw product fields as stored in the Firestore `products` collection. */
 export interface ProductInput {
@@ -231,45 +230,3 @@ export async function deleteProductImage(url: string): Promise<void> {
   }
 }
 
-/** Build a stored product from a built-in catalogue entry. */
-function rawToInput(p: (typeof RAW_PRODUCTS)[number], order: number): ProductInput {
-  return {
-    name: p.name,
-    lat: p.lat,
-    cat: p.cat,
-    motif: p.motif,
-    image: normalizeImages(p.images, p.image)[0] ?? "",
-    images: normalizeImages(p.images, p.image),
-    price: p.price,
-    old: p.old,
-    disc: p.disc,
-    rating: p.rating,
-    inStock: p.inStock,
-    season: p.season,
-    cls: p.cls,
-    height: p.height,
-    bloom: p.bloom,
-    depth: p.depth,
-    zone: p.zone,
-    color: p.color,
-    usage: p.usage,
-    packs: [],
-    order,
-  };
-}
-
-/**
- * Полностью заменить каталог: удалить все товары и залить встроенный список
- * из таблицы. Удаление и запись идут одной атомарной транзакцией (batch).
- */
-export async function replaceCatalog(): Promise<number> {
-  const existing = await getDocs(collection(db, PRODUCTS_COLLECTION));
-  const batch = writeBatch(db);
-  existing.docs.forEach((d) => batch.delete(d.ref));
-  RAW_PRODUCTS.forEach((p, i) => {
-    const ref = doc(collection(db, PRODUCTS_COLLECTION));
-    batch.set(ref, rawToInput(p, i) as unknown as Record<string, unknown>);
-  });
-  await batch.commit();
-  return RAW_PRODUCTS.length;
-}

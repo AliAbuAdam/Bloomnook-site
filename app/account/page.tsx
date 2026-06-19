@@ -199,7 +199,7 @@ export default function AccountPage() {
           <p style={{ color: "#c0392b", fontSize: 14, margin: 0 }}>{ordersError}</p>
         ) : orders.length === 0 ? (
           <p style={{ color: "var(--muted)", fontSize: 14, margin: 0, lineHeight: 1.6 }}>
-            Заказов пока нет. Оформление и оплата заказов идут через Ozon — там же отображается их статус.
+            Заказов пока нет. Выберите луковицы в каталоге и оформите заказ — он появится здесь.
           </p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -225,6 +225,12 @@ export default function AccountPage() {
                   <span>Итого</span>
                   <span>{money(o.total)}</span>
                 </div>
+                {o.customer && (o.customer.name || o.customer.city || o.customer.address) && (
+                  <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 8, lineHeight: 1.5 }}>
+                    Доставка: {[o.customer.name, o.customer.city, o.customer.address].filter(Boolean).join(", ")}
+                    {o.customer.phone ? ` · ${o.customer.phone}` : ""}
+                  </div>
+                )}
               </div>
             ))}
           </div>

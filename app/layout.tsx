@@ -6,6 +6,7 @@ import Announcement from "@/components/Announcement";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { CartProvider } from "@/contexts/CartContext";
 
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
@@ -31,12 +32,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <MotifSprite />
         <AuthProvider>
-          <div style={{ background: "#fff", minHeight: "100vh" }}>
-            <Announcement />
-            <Header />
-            {children}
-            <Footer />
-          </div>
+          <CartProvider>
+            <div style={{ background: "#fff", minHeight: "100vh" }}>
+              <Announcement />
+              <Header />
+              {children}
+              <Footer />
+            </div>
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>

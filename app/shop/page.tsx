@@ -1,6 +1,5 @@
 import Link from "next/link";
 import ShopBrowser from "@/components/ShopBrowser";
-import { products } from "@/lib/data";
 
 export default function ShopPage() {
   return (
@@ -19,7 +18,7 @@ export default function ShopPage() {
         </div>
       </div>
 
-      <ShopBrowser fallback={products} />
+      <ShopBrowser fallback={[]} />
     </main>
   );
 }

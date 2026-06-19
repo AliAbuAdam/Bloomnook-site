@@ -6,6 +6,7 @@ import Image from "next/image";
 import headerLogo from "@/public/header_logo.svg";
 import { Search, Heart, Cart, User, Menu, Close } from "./icons";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 import AuthModal from "./AuthModal";
 
 const navLink: React.CSSProperties = {
@@ -43,6 +44,7 @@ const cartBadge: React.CSSProperties = {
 export default function Header() {
   const [open, setOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { totalQty, hydrated } = useCart();
   const [authOpen, setAuthOpen] = useState(false);
   // Выпадающее меню профиля (десктоп) для залогиненного пользователя.
   const [menuOpen, setMenuOpen] = useState(false);
@@ -122,9 +124,9 @@ export default function Header() {
           <span className="bn-hide-xs bn-icon-btn" style={{ display: "flex", cursor: "pointer" }}>
             <Heart />
           </span>
-          <Link href="/cart" className="bn-icon-btn" style={{ cursor: "pointer", position: "relative", color: "var(--ink)", display: "flex" }}>
+          <Link href="/cart" className="bn-icon-btn" style={{ cursor: "pointer", position: "relative", color: "var(--ink)", display: "flex" }} aria-label="Корзина">
             <Cart />
-            <span style={cartBadge}>4</span>
+            {hydrated && totalQty > 0 && <span style={cartBadge}>{totalQty}</span>}
           </Link>
           <div ref={userBoxRef} className="bn-hide-xs" style={{ position: "relative", display: "flex" }}>
             <button
