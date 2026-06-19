@@ -174,8 +174,8 @@ export default function Home() {
                 <Truck size={19} strokeWidth={1.7} />
               </span>
               <div style={{ whiteSpace: "nowrap" }}>
-                <div style={{ fontWeight: 800, fontSize: 14 }}>Доставка через Ozon</div>
-                <div style={{ fontSize: 12, color: "var(--muted)" }}>по всей России</div>
+                <div style={{ fontWeight: 800, fontSize: 14 }}>Доставка по всей России</div>
+                <div style={{ fontSize: 12, color: "var(--muted)" }}>через Ozon</div>
               </div>
             </div>
             <div
