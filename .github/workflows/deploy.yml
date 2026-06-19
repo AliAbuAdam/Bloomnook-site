@@ -57,8 +57,8 @@ jobs:
         env:
           # Сайт отдаётся по адресу <user>.github.io/<repo>/, поэтому
           # basePath = "/<repo>" (обязательно с ведущим слэшем).
-          # Для custom domain позже установи PAGES_BASE_PATH: "" (пустая строка).
-          PAGES_BASE_PATH: /${{ github.event.repository.name }}
+          # Custom domain (bloomnook.ru): basePath пустой, сайт в корне домена.
+          PAGES_BASE_PATH: ""
           # Конфиг Firebase. Значения публичные (попадают в бандл), хранятся
           # как Variables репозитория: Settings → Secrets and variables →
           # Actions → вкладка Variables.
