@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Motif from "@/components/Motif";
 import AuthModal from "@/components/AuthModal";
+import ConsentCheckbox from "@/components/ConsentCheckbox";
 import { Minus, Plus, Close, Truck, Lock, Check } from "@/components/icons";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -50,6 +51,7 @@ export default function CartPage() {
   const [city, setCity] = useState("");
   const [address, setAddress] = useState("");
   const [comment, setComment] = useState("");
+  const [consent, setConsent] = useState(false);
 
   // Подставляем email из аккаунта, пока поле пустое.
   useEffect(() => {
@@ -80,6 +82,10 @@ export default function CartPage() {
     if (lines.length === 0) return;
     if (!name.trim() || !phone.trim() || !email.trim() || !city.trim() || !address.trim()) {
       setError("Заполните обязательные поля: имя, телефон, email, город и адрес доставки.");
+      return;
+    }
+    if (!consent) {
+      setError("Подтвердите согласие на обработку персональных данных.");
       return;
     }
     setPlacing(true);
@@ -154,6 +160,8 @@ export default function CartPage() {
               <CheckoutForm
                 values={{ name, phone, email, city, address, comment }}
                 set={{ setName, setPhone, setEmail, setCity, setAddress, setComment }}
+                consent={consent}
+                onConsentChange={setConsent}
                 onBack={() => setMode("cart")}
               />
             ) : (
@@ -302,7 +310,7 @@ export default function CartPage() {
             {error && <div style={{ color: "#c0392b", fontSize: 13, marginBottom: 14 }}>{error}</div>}
             <button
               onClick={checkout ? placeOrder : goToCheckout}
-              disabled={placing}
+              disabled={placing || (checkout && !consent)}
               className="bn-hover-fade"
               style={{
                 width: "100%",
@@ -313,8 +321,8 @@ export default function CartPage() {
                 fontSize: 16,
                 padding: 16,
                 borderRadius: 999,
-                cursor: placing ? "default" : "pointer",
-                opacity: placing ? 0.6 : 1,
+                cursor: placing || (checkout && !consent) ? "default" : "pointer",
+                opacity: placing || (checkout && !consent) ? 0.6 : 1,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -370,7 +378,19 @@ interface FormSetters {
 }
 
 /** Форма контактов и доставки на шаге оформления. */
-function CheckoutForm({ values, set, onBack }: { values: FormValues; set: FormSetters; onBack: () => void }) {
+function CheckoutForm({
+  values,
+  set,
+  consent,
+  onConsentChange,
+  onBack,
+}: {
+  values: FormValues;
+  set: FormSetters;
+  consent: boolean;
+  onConsentChange: (v: boolean) => void;
+  onBack: () => void;
+}) {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 20 }}>
@@ -416,7 +436,10 @@ function CheckoutForm({ values, set, onBack }: { values: FormValues; set: FormSe
           />
         </div>
       </div>
-      <p style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 16, lineHeight: 1.6 }}>
+      <div style={{ marginTop: 18 }}>
+        <ConsentCheckbox checked={consent} onChange={onConsentChange} id="checkout-consent" />
+      </div>
+      <p style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 14, lineHeight: 1.6 }}>
         Поля со звёздочкой (*) обязательны. После оформления мы свяжемся с вами для подтверждения.
       </p>
     </div>

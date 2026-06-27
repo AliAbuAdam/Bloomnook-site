@@ -5,6 +5,7 @@ import MotifSprite from "@/components/MotifSprite";
 import Announcement from "@/components/Announcement";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import CookieBanner from "@/components/CookieBanner";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Header />
               {children}
               <Footer />
+              <CookieBanner />
             </div>
           </CartProvider>
         </AuthProvider>

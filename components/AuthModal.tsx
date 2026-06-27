@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { FirebaseError } from "firebase/app";
 import { useAuth, authErrorMessage } from "@/contexts/AuthContext";
+import ConsentCheckbox from "./ConsentCheckbox";
 import { Close } from "./icons";
 
 type Mode = "login" | "register" | "reset";
@@ -55,6 +56,7 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [consent, setConsent] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
@@ -74,6 +76,7 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
       setEmail("");
       setPassword("");
       setConfirm("");
+      setConsent(false);
       setError("");
       setNotice("");
       setBusy(false);
@@ -86,6 +89,7 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
     setNotice("");
     setPassword("");
     setConfirm("");
+    setConsent(false);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -95,6 +99,11 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
 
     if (mode === "register" && password !== confirm) {
       setError("Пароли не совпадают");
+      return;
+    }
+
+    if (mode === "register" && !consent) {
+      setError("Подтвердите согласие на обработку персональных данных");
       return;
     }
 
@@ -208,10 +217,20 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
               </div>
             )}
 
+            {mode === "register" && (
+              <div style={{ marginBottom: 16 }}>
+                <ConsentCheckbox checked={consent} onChange={setConsent} id="auth-consent" />
+              </div>
+            )}
+
             {error && <div style={{ color: "#c0392b", fontSize: 13, marginBottom: 16 }}>{error}</div>}
             {notice && <div style={{ color: "var(--green-3)", fontSize: 13, marginBottom: 16 }}>{notice}</div>}
 
-            <button type="submit" disabled={busy} style={{ ...primaryBtn, opacity: busy ? 0.6 : 1 }}>
+            <button
+              type="submit"
+              disabled={busy || (mode === "register" && !consent)}
+              style={{ ...primaryBtn, opacity: busy || (mode === "register" && !consent) ? 0.6 : 1, cursor: busy || (mode === "register" && !consent) ? "default" : "pointer" }}
+            >
               {busy
                 ? "Подождите…"
                 : mode === "login"

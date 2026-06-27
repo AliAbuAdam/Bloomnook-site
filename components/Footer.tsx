@@ -101,9 +101,9 @@ export default function Footer() {
         >
           <span>© 2026 Bloom Nook. ИП Ахмедов Санан Имамгулу оглы · ОГРНИП 324508100295959 · ИНН 504108091325</span>
           <span style={{ display: "flex", gap: 22 }}>
-            <a href="#" className="bn-foot-link" style={colLink}>
+            <Link href="/privacy" className="bn-foot-link" style={colLink}>
               Политика конфиденциальности
-            </a>
+            </Link>
             <a href="#" className="bn-foot-link" style={colLink}>
               Оферта
             </a>
