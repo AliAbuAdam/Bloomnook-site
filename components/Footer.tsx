@@ -81,6 +81,9 @@ export default function Footer() {
               <span>+7 495 000-00-00</span>
               <span>hello@bloomnook.ru</span>
               <span>Россия, доставка по всей стране</span>
+              <Link href="/contacts" className="bn-foot-link" style={{ ...colLink, opacity: 1, fontWeight: 600 }}>
+                Контакты и реквизиты
+              </Link>
             </div>
           </div>
         </div>
@@ -96,7 +99,7 @@ export default function Footer() {
             gap: 12,
           }}
         >
-          <span>© 2026 Bloom Nook. Все права защищены.</span>
+          <span>© 2026 Bloom Nook. ИП Ахмедов Санан Имамгулу оглы · ОГРНИП 324508100295959 · ИНН 504108091325</span>
           <span style={{ display: "flex", gap: 22 }}>
             <a href="#" className="bn-foot-link" style={colLink}>
               Политика конфиденциальности

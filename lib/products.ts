@@ -32,8 +32,10 @@ export interface ProductInput {
   bloom: string; // срок цветения ("Июль-Август")
   depth: string; // глубина посадки, см
   zone: string; // зона USDA
+  caliber: string; // разбор / калибр луковиц ("20/22")
   color: string; // особенности окраски и формы
   usage: string; // применение
+  care: string; // условия выращивания и уход
   packs: number[]; // комплекты (шт в наборе), напр. [3, 5, 10]; [] — только поштучно
   order: number;
 }
@@ -102,8 +104,10 @@ export function toDisplayProduct(p: AdminProduct, index: number): Product {
     bloomMonths: bloomToMonths(p.bloom),
     depth: p.depth,
     zone: p.zone,
+    caliber: p.caliber,
     color: p.color,
     usage: p.usage,
+    care: p.care,
     packs: normalizePacks(p.packs),
     tile: TILE_TINTS[index % 2],
   };
@@ -129,8 +133,10 @@ export function emptyProduct(order: number): ProductInput {
     bloom: "",
     depth: "",
     zone: "",
+    caliber: "",
     color: "",
     usage: "",
+    care: "",
     packs: [],
     order,
   };
@@ -155,8 +161,10 @@ function inputFromDoc(data: Record<string, unknown>): ProductInput {
     bloom: String(data.bloom ?? ""),
     depth: String(data.depth ?? ""),
     zone: String(data.zone ?? ""),
+    caliber: String(data.caliber ?? ""),
     color: String(data.color ?? ""),
     usage: String(data.usage ?? ""),
+    care: String(data.care ?? ""),
     packs: normalizePacks(data.packs),
     order: Number(data.order ?? 0),
   };

@@ -22,6 +22,7 @@ const navItems = [
   { label: "Посадка", href: "/#steps" },
   { label: "Отзывы", href: "/#reviews" },
   { label: "FAQ", href: "/#faq" },
+  { label: "Контакты", href: "/contacts" },
 ];
 
 const cartBadge: React.CSSProperties = {

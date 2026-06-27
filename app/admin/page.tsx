@@ -725,6 +725,10 @@ export default function AdminPage() {
               <label style={label}>Зона USDA</label>
               <input style={input} value={form.zone} onChange={(e) => setField("zone", e.target.value)} placeholder="3–4" />
             </div>
+            <div>
+              <label style={label}>Разбор луковиц</label>
+              <input style={input} value={form.caliber} onChange={(e) => setField("caliber", e.target.value)} placeholder="20/22" />
+            </div>
             <div style={{ gridColumn: "span 3" }}>
               <label style={label}>Особенности окраски и формы</label>
               <input style={input} value={form.color} onChange={(e) => setField("color", e.target.value)} />
@@ -732,6 +736,15 @@ export default function AdminPage() {
             <div style={{ gridColumn: "span 3" }}>
               <label style={label}>Применение</label>
               <input style={input} value={form.usage} onChange={(e) => setField("usage", e.target.value)} placeholder="Срезка, группы" />
+            </div>
+            <div style={{ gridColumn: "span 3" }}>
+              <label style={label}>Условия выращивания и уход</label>
+              <textarea
+                style={{ ...input, minHeight: 96, resize: "vertical" }}
+                value={form.care}
+                onChange={(e) => setField("care", e.target.value)}
+                placeholder="Освещение, полив, почва, подкормки, зимовка…"
+              />
             </div>
           </div>
           <div style={{ display: "flex", gap: 12, marginTop: 20 }}>

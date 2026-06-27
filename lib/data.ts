@@ -68,8 +68,10 @@ export interface Product {
   bloomMonths: string[];
   depth: string;
   zone: string;
+  caliber: string; // разбор / калибр луковиц («20/22»)
   color: string;
   usage: string;
+  care: string; // условия выращивания и уход
   /**
    * Доступные комплекты (фасовка) — число штук в наборе. Цена линейна:
    * комплект из N шт стоит `priceValue × N`. Поштучная продажа (1 шт)

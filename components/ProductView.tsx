@@ -18,6 +18,7 @@ const SEASON_LABEL: Record<Season, string> = {
 function specs(p: Product): { label: string; value: string }[] {
   return [
     { label: "Класс / группа", value: p.cls },
+    { label: "Разбор луковиц", value: p.caliber },
     { label: "Высота", value: p.height ? `${p.height} см` : "" },
     { label: "Срок цветения", value: p.bloom },
     { label: "Глубина посадки", value: p.depth ? `${p.depth} см` : "" },
@@ -517,8 +518,13 @@ export default function ProductView() {
               <b style={{ color: "var(--ink)" }}>Почва:</b> рыхлая, дренированная, нейтральная. На зиму замульчируйте торфом или листвой.
             </p>
             {p.zone && (
-              <p style={{ margin: 0 }}>
+              <p style={{ margin: "0 0 14px" }}>
                 <b style={{ color: "var(--ink)" }}>Зона зимостойкости (USDA):</b> {p.zone}.
+              </p>
+            )}
+            {p.care && (
+              <p style={{ margin: 0, whiteSpace: "pre-line" }}>
+                <b style={{ color: "var(--ink)" }}>Условия выращивания и уход:</b> {p.care}
               </p>
             )}
           </div>
