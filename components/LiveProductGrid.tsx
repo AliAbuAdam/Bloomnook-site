@@ -6,9 +6,9 @@ import { fetchDisplayProducts } from "@/lib/products";
 import type { Product } from "@/lib/data";
 
 /**
- * Product grid that hydrates from Firestore but renders a static fallback first,
+ * Product grid that hydrates from PocketBase but renders a static fallback first,
  * so the storefront stays pixel-perfect on the server and never breaks if
- * Firestore is empty or unreachable.
+ * PocketBase is empty or unreachable.
  */
 export default function LiveProductGrid({
   fallback,

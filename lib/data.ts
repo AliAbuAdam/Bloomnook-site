@@ -34,7 +34,7 @@ export function bloomToMonths(bloom: string): string[] {
 
 /**
  * Привести фото товара к массиву. Поддерживает и новое поле `images`, и старое
- * `image` (одна картинка) — для совместимости со старыми записями в Firestore.
+ * `image` (одна картинка) — для совместимости со старыми записями.
  */
 export function normalizeImages(images?: unknown, image?: unknown): string[] {
   if (Array.isArray(images)) return images.map(String).filter(Boolean);

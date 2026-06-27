@@ -39,8 +39,7 @@ node scripts/pb-setup.mjs
 ```
 
 ## 6. Каталог
-- Перенос из Firebase: `… node --env-file=.env.local scripts/migrate-firestore-to-pb.mjs`
-- Или демо: `… node scripts/seed.mjs`
+- Демо-товары: `… node scripts/seed.mjs`
 
 ## 7. Назначить себя админом сайта
 В дашборде PocketBase: коллекция `users` → зарегистрируйтесь на сайте (или
@@ -60,6 +59,3 @@ node scripts/pb-setup.mjs
 ## 10. Бэкапы (важно для РФ-хранения)
 Дашборд → Settings → Backups → включите авто-бэкапы и выгрузку в российский
 S3 (Selectel/VK), чтобы и копии оставались в РФ.
-
----
-После успешной проверки можно убрать Firebase (см. раздел 5 в `SETUP-pocketbase.md`).

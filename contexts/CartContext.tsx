@@ -8,7 +8,7 @@ import type { Motif, Product } from "@/lib/data";
  * РАЗНЫЕ позиции, поэтому ключ строки = `id:pack`.
  */
 export interface CartLine {
-  id: string; // id товара (документа Firestore)
+  id: string; // id товара (записи PocketBase)
   pack: number; // фасовка: число штук в комплекте (1 — поштучно)
   qty: number; // сколько комплектов в корзине
   name: string;
