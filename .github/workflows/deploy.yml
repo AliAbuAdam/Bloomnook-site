@@ -59,16 +59,10 @@ jobs:
           # basePath = "/<repo>" (обязательно с ведущим слэшем).
           # Custom domain (bloomnook.ru): basePath пустой, сайт в корне домена.
           PAGES_BASE_PATH: ""
-          # Конфиг Firebase. Значения публичные (попадают в бандл), хранятся
-          # как Variables репозитория: Settings → Secrets and variables →
-          # Actions → вкладка Variables.
-          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
-          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
-          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
-          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ vars.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
-          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
-          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
-          NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
+          # Адрес API PocketBase. Задать как Variable репозитория:
+          # Settings → Secrets and variables → Actions → вкладка Variables →
+          # NEXT_PUBLIC_PB_URL = https://api.bloomnook.ru
+          NEXT_PUBLIC_PB_URL: ${{ vars.NEXT_PUBLIC_PB_URL }}
         run: npm run build
 
       - name: Upload Pages artifact
