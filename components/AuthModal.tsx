@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FirebaseError } from "firebase/app";
 import { useAuth, authErrorMessage } from "@/contexts/AuthContext";
 import ConsentCheckbox from "./ConsentCheckbox";
 import { Close } from "./icons";
@@ -120,8 +119,7 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
         setNotice("Письмо для сброса пароля отправлено. Проверьте почту.");
       }
     } catch (err) {
-      const code = err instanceof FirebaseError ? err.code : "";
-      setError(authErrorMessage(code));
+      setError(authErrorMessage(err));
     } finally {
       setBusy(false);
     }

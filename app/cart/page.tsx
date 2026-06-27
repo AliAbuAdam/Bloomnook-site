@@ -96,7 +96,7 @@ export default function CartPage() {
         qty: l.qty,
         price: l.unitPrice * l.pack,
       }));
-      const id = await createOrder(user.uid, items, subtotal, {
+      const id = await createOrder(user.id, items, subtotal, {
         name: name.trim(),
         phone: phone.trim(),
         email: email.trim(),

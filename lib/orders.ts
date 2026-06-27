@@ -1,5 +1,4 @@
-import { collection, getDocs, addDoc, query, orderBy, serverTimestamp, Timestamp } from "firebase/firestore";
-import { db } from "./firebase";
+import { pb, ORDERS } from "./pb";
 
 /** Позиция в заказе. */
 export interface OrderItem {
@@ -18,7 +17,7 @@ export interface OrderCustomer {
   comment: string; // комментарий к заказу ("" — нет)
 }
 
-/** Заказ пользователя, как он хранится в Firestore. */
+/** Заказ пользователя, как он хранится в PocketBase. */
 export interface Order {
   id: string;
   createdAt: Date | null;
@@ -42,39 +41,30 @@ function customerFromDoc(raw: unknown): OrderCustomer | null {
   };
 }
 
-/** Путь к коллекции заказов конкретного пользователя. */
-export function ordersCollection(uid: string) {
-  return collection(db, "users", uid, "orders");
-}
-
 /**
- * Загрузить заказы пользователя (по убыванию даты).
- *
- * Сейчас на сайте нет оформления заказа (покупка идёт через Ozon), поэтому
- * коллекция обычно пуста — это ожидаемо. Структура заложена так, чтобы позже
- * сюда можно было писать заказы (через админку или будущий чекаут).
+ * Загрузить заказы пользователя (по убыванию даты создания).
+ * Доступ ограничен API-правилами PocketBase: пользователь видит только свои
+ * заказы (`user = @request.auth.id`).
  */
 export async function fetchUserOrders(uid: string): Promise<Order[]> {
-  const q = query(ordersCollection(uid), orderBy("createdAt", "desc"));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => {
-    const data = d.data() as Record<string, unknown>;
-    const created = data.createdAt;
-    return {
-      id: d.id,
-      createdAt: created instanceof Timestamp ? created.toDate() : null,
-      items: Array.isArray(data.items) ? (data.items as OrderItem[]) : [],
-      total: typeof data.total === "number" ? data.total : 0,
-      status: typeof data.status === "string" ? data.status : "Оформлен",
-      customer: customerFromDoc(data.customer),
-    };
+  const rows = await pb.collection(ORDERS).getFullList({
+    filter: pb.filter("user = {:uid}", { uid }),
+    sort: "-created",
   });
+  return rows.map((r) => ({
+    id: r.id,
+    createdAt: r.created ? new Date(r.created as string) : null,
+    items: Array.isArray(r.items) ? (r.items as OrderItem[]) : [],
+    total: typeof r.total === "number" ? r.total : 0,
+    status: typeof r.status === "string" ? r.status : "Оформлен",
+    customer: customerFromDoc(r.customer),
+  }));
 }
 
 /**
  * Создать заказ пользователя из позиций корзины с контактами получателя.
- * Дата проставляется на сервере (`serverTimestamp`), статус по умолчанию —
- * «Оформлен». Возвращает id заказа.
+ * Дата создания (`created`) проставляется PocketBase автоматически, статус по
+ * умолчанию — «Оформлен». Возвращает id заказа.
  */
 export async function createOrder(
   uid: string,
@@ -82,12 +72,12 @@ export async function createOrder(
   total: number,
   customer: OrderCustomer,
 ): Promise<string> {
-  const ref = await addDoc(ordersCollection(uid), {
-    createdAt: serverTimestamp(),
+  const rec = await pb.collection(ORDERS).create({
+    user: uid,
     items,
     total,
     status: "Оформлен",
     customer,
   });
-  return ref.id;
+  return rec.id;
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { FirebaseError } from "firebase/app";
 import { useAuth, authErrorMessage } from "@/contexts/AuthContext";
 import AuthModal from "@/components/AuthModal";
 import { fetchUserOrders, type Order } from "@/lib/orders";
@@ -83,7 +82,7 @@ export default function AccountPage() {
   }, []);
 
   useEffect(() => {
-    if (user) loadOrders(user.uid);
+    if (user) loadOrders(user.id);
   }, [user, loadOrders]);
 
   async function handleChangePassword(e: React.FormEvent) {
@@ -102,8 +101,7 @@ export default function AccountPage() {
       setNext("");
       setConfirm("");
     } catch (err) {
-      const code = err instanceof FirebaseError ? err.code : "";
-      setPwError(authErrorMessage(code));
+      setPwError(authErrorMessage(err));
     } finally {
       setPwBusy(false);
     }

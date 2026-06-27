@@ -1,19 +1,10 @@
-// Разовый сид каталога товаров в Firestore (коллекция `products`).
-// Запуск (Node 20.6+): node --env-file=.env.local scripts/seed.mjs
-// Правила Firestore требуют авторизации на запись, поэтому скрипт логинится
-// под учёткой администратора (ADMIN_EMAIL / ADMIN_PASSWORD из .env.local).
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, writeBatch, doc } from "firebase/firestore";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
+// Разовый сид демо-каталога товаров в PocketBase (коллекция `products`).
+// Запуск:
+//   PB_URL=http://127.0.0.1:8090 \
+//   PB_SUPERUSER_EMAIL=admin@example.com \
+//   PB_SUPERUSER_PASSWORD=... \
+//   node scripts/seed.mjs
+import PocketBase from "pocketbase";
 
 const RAW = [
   { name: "Тюльпан «Триумф», микс", cat: "Тюльпаны", motif: "tulip", price: 690, old: 990, disc: 30, rating: 4.9 },
@@ -30,29 +21,45 @@ const RAW = [
   { name: "Гиацинт «Карнеги», белый", cat: "Гиацинты", motif: "hyacinth", price: 470, old: 590, disc: 20, rating: 4.6 },
 ];
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const adminEmail = process.env.ADMIN_EMAIL;
-const adminPassword = process.env.ADMIN_PASSWORD;
-if (!adminEmail || !adminPassword) {
-  console.error("Не заданы ADMIN_EMAIL / ADMIN_PASSWORD. Запусти: node --env-file=.env.local scripts/seed.mjs");
+const URL = process.env.PB_URL || "http://127.0.0.1:8090";
+const EMAIL = process.env.PB_SUPERUSER_EMAIL;
+const PASSWORD = process.env.PB_SUPERUSER_PASSWORD;
+if (!EMAIL || !PASSWORD) {
+  console.error("Задайте PB_SUPERUSER_EMAIL и PB_SUPERUSER_PASSWORD.");
   process.exit(1);
 }
-await signInWithEmailAndPassword(getAuth(app), adminEmail, adminPassword);
 
-const col = collection(db, "products");
+const pb = new PocketBase(URL);
+pb.autoCancellation(false);
+await pb.collection("_superusers").authWithPassword(EMAIL, PASSWORD);
 
-const existing = await getDocs(col);
-if (!existing.empty) {
-  console.log(`В коллекции уже ${existing.size} товаров — сид пропущен (чтобы не дублировать).`);
+const existing = await pb.collection("products").getList(1, 1);
+if (existing.totalItems > 0) {
+  console.log(`В коллекции уже ${existing.totalItems} товаров — сид пропущен (чтобы не дублировать).`);
   process.exit(0);
 }
 
-const batch = writeBatch(db);
-RAW.forEach((p, i) => {
-  batch.set(doc(col), { ...p, inStock: true, order: i });
-});
-await batch.commit();
+let i = 0;
+for (const p of RAW) {
+  await pb.collection("products").create({
+    ...p,
+    lat: "",
+    image: "",
+    images: [],
+    inStock: true,
+    season: "autumn",
+    cls: "",
+    height: "",
+    bloom: "",
+    depth: "",
+    zone: "",
+    caliber: "",
+    color: "",
+    usage: "",
+    care: "",
+    packs: [],
+    order: i++,
+  });
+}
 console.log(`Засеяно товаров: ${RAW.length}`);
 process.exit(0);

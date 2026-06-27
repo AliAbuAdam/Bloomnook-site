@@ -1,26 +1,14 @@
-import {
-  collection,
-  getDocs,
-  getDoc,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  query,
-  orderBy,
-} from "firebase/firestore";
-import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
-import { db, storage } from "./firebase";
+import { pb, PRODUCTS, MEDIA, ADMINS } from "./pb";
 import { money, discount, heightToCm, bloomToMonths, normalizeImages, type Motif, type Season, type Product } from "./data";
 
-/** Raw product fields as stored in the Firestore `products` collection. */
+/** Raw product fields as stored in the PocketBase `products` collection. */
 export interface ProductInput {
   name: string;
   lat: string; // сорт на латинице, "" — нет
   cat: string;
   motif: Motif;
   image: string; // обложка = первое фото (дублируется из images[0] для совместимости)
-  images: string[]; // все фото товара (URL в Firebase Storage); [] — нет (рисуется силуэт-мотив)
+  images: string[]; // все фото товара (URL медиа-файлов PocketBase); [] — нет (рисуется силуэт-мотив)
   price: number;
   old: number; // 0 = no old price
   disc: number; // 0 = no discount
@@ -53,18 +41,26 @@ export function normalizePacks(raw: unknown): number[] {
   return Array.from(new Set(nums)).sort((a, b) => a - b);
 }
 
-/** A stored product with its Firestore document id. */
+/** A stored product with its PocketBase record id. */
 export interface AdminProduct extends ProductInput {
   id: string;
 }
 
-export const PRODUCTS_COLLECTION = "products";
-export const ADMINS_COLLECTION = "admins";
+export const PRODUCTS_COLLECTION = PRODUCTS;
 
-/** True, если для данного UID есть документ в коллекции `admins`. */
-export async function isAdminUser(uid: string): Promise<boolean> {
-  const snap = await getDoc(doc(db, ADMINS_COLLECTION, uid));
-  return snap.exists();
+/**
+ * True, если текущий авторизованный пользователь — администратор.
+ * Админство выдаётся записью в коллекции `admins` (создаётся только из
+ * админки PocketBase). API-правила разрешают видеть лишь свою запись, поэтому
+ * непустой результат = пользователь админ.
+ */
+export async function isCurrentUserAdmin(): Promise<boolean> {
+  const uid = pb.authStore.record?.id;
+  if (!uid) return false;
+  const rows = await pb.collection(ADMINS).getFullList({
+    filter: pb.filter("user = {:uid}", { uid }),
+  });
+  return rows.length > 0;
 }
 
 export const MOTIFS: Motif[] = ["tulip", "narcissus", "hyacinth", "lily", "crocus"];
@@ -172,8 +168,8 @@ function inputFromDoc(data: Record<string, unknown>): ProductInput {
 
 /** Fetch all products ordered by their `order` field. */
 export async function fetchProducts(): Promise<AdminProduct[]> {
-  const snap = await getDocs(query(collection(db, PRODUCTS_COLLECTION), orderBy("order")));
-  return snap.docs.map((d) => ({ id: d.id, ...inputFromDoc(d.data()) }));
+  const rows = await pb.collection(PRODUCTS).getFullList({ sort: "order" });
+  return rows.map((r) => ({ id: r.id, ...inputFromDoc(r) }));
 }
 
 /** Fetch products mapped to the storefront display shape. */
@@ -192,18 +188,21 @@ function withNormalizedImages(input: ProductInput): ProductInput {
 }
 
 export async function addProduct(input: ProductInput): Promise<void> {
-  await addDoc(collection(db, PRODUCTS_COLLECTION), withNormalizedImages(input) as unknown as Record<string, unknown>);
+  await pb.collection(PRODUCTS).create(withNormalizedImages(input));
 }
 
 export async function updateProduct(id: string, input: ProductInput): Promise<void> {
-  await updateDoc(doc(db, PRODUCTS_COLLECTION, id), withNormalizedImages(input) as unknown as Record<string, unknown>);
+  await pb.collection(PRODUCTS).update(id, withNormalizedImages(input));
 }
 
-/** Загрузить один товар по его id документа (для страницы товара). */
+/** Загрузить один товар по его id записи (для страницы товара). */
 export async function fetchProductById(id: string): Promise<AdminProduct | null> {
-  const snap = await getDoc(doc(db, PRODUCTS_COLLECTION, id));
-  if (!snap.exists()) return null;
-  return { id: snap.id, ...inputFromDoc(snap.data()) };
+  try {
+    const r = await pb.collection(PRODUCTS).getOne(id);
+    return { id: r.id, ...inputFromDoc(r) };
+  } catch {
+    return null;
+  }
 }
 
 /** Загрузить один товар по id в форме для витрины (страница товара). */
@@ -213,28 +212,33 @@ export async function fetchDisplayProductById(id: string): Promise<Product | nul
 }
 
 export async function deleteProduct(id: string): Promise<void> {
-  await deleteDoc(doc(db, PRODUCTS_COLLECTION, id));
+  await pb.collection(PRODUCTS).delete(id);
 }
 
 /**
- * Загрузить фото товара в Firebase Storage (папка `products/`) и вернуть его
- * публичный URL для сохранения в поле `image`.
+ * Загрузить фото товара в PocketBase (коллекция `media`, по одному файлу на
+ * запись) и вернуть его публичный URL для сохранения в поле `image`/`images`.
  */
 export async function uploadProductImage(file: File): Promise<string> {
-  const safeName = file.name.replace(/[^\w.\-]+/g, "_");
-  const path = `products/${Date.now()}-${safeName}`;
-  const ref = storageRef(storage, path);
-  await uploadBytes(ref, file, { contentType: file.type || "image/jpeg" });
-  return getDownloadURL(ref);
+  const rec = await pb.collection(MEDIA).create({ file });
+  return pb.files.getURL(rec, rec.file as string);
 }
 
-/** Удалить файл фото по его download-URL. Тихо игнорирует чужие/внешние ссылки. */
+/** id записи медиа из её файлового URL (`/api/files/{collection}/{recordId}/{file}`). */
+function mediaRecordId(url: string): string | null {
+  const m = url.match(/\/api\/files\/[^/]+\/([^/]+)\/[^/?]+/);
+  return m ? m[1] : null;
+}
+
+/** Удалить файл фото по его URL. Тихо игнорирует чужие/внешние ссылки. */
 export async function deleteProductImage(url: string): Promise<void> {
-  if (!url || !url.includes("firebasestorage.googleapis.com")) return;
+  if (!url) return;
+  if (pb.baseURL && !url.startsWith(pb.baseURL)) return; // не из нашего хранилища
+  const id = mediaRecordId(url);
+  if (!id) return;
   try {
-    await deleteObject(storageRef(storage, url));
+    await pb.collection(MEDIA).delete(id);
   } catch {
-    /* файл уже удалён или путь не из нашего бакета — не критично */
+    /* файл уже удалён или запись не наша — не критично */
   }
 }
-

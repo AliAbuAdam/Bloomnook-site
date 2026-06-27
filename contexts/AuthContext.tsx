@@ -1,22 +1,11 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import {
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  sendPasswordResetEmail,
-  updatePassword,
-  reauthenticateWithCredential,
-  EmailAuthProvider,
-  type User,
-} from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { pb, USERS, type BloomUser } from "@/lib/pb";
 
 interface AuthContextValue {
-  user: User | null;
-  /** true, пока не пришёл первый ответ от Firebase о состоянии сессии. */
+  user: BloomUser | null;
+  /** true, пока не определено начальное состояние сессии. */
   loading: boolean;
   register: (email: string, password: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
@@ -28,29 +17,28 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 /**
- * Перевод кодов ошибок Firebase Auth в человекочитаемые русские сообщения.
- * Незнакомые коды отдаём общим текстом, чтобы не показывать пользователю
- * технический код.
+ * Перевод ошибок PocketBase в человекочитаемые русские сообщения.
+ * PocketBase кидает `ClientResponseError` с полями `status` и `response.data`
+ * (ошибки валидации по полям). Незнакомое отдаём общим текстом.
  */
-export function authErrorMessage(code: string): string {
-  switch (code) {
-    case "auth/invalid-email":
-      return "Некорректный email";
-    case "auth/user-disabled":
-      return "Аккаунт заблокирован";
-    case "auth/user-not-found":
-    case "auth/wrong-password":
-    case "auth/invalid-credential":
+export function authErrorMessage(err: unknown): string {
+  const e = err as { status?: number; response?: { data?: Record<string, { code?: string }> } };
+  const data = e?.response?.data ?? {};
+
+  if (data.email?.code === "validation_not_unique") return "Этот email уже зарегистрирован";
+  if (data.email) return "Некорректный email";
+  if (data.password) return "Пароль слишком простой (минимум 8 символов)";
+  if (data.oldPassword) return "Неверный текущий пароль";
+
+  switch (e?.status) {
+    case 400:
       return "Неверный email или пароль";
-    case "auth/email-already-in-use":
-      return "Этот email уже зарегистрирован";
-    case "auth/weak-password":
-      return "Пароль слишком простой (минимум 6 символов)";
-    case "auth/too-many-requests":
+    case 401:
+    case 403:
+      return "Для этого действия войдите в аккаунт заново";
+    case 429:
       return "Слишком много попыток. Попробуйте позже";
-    case "auth/requires-recent-login":
-      return "Для смены пароля войдите в аккаунт заново";
-    case "auth/network-request-failed":
+    case 0:
       return "Нет связи с сервером. Проверьте интернет";
     default:
       return "Что-то пошло не так. Попробуйте ещё раз";
@@ -58,44 +46,52 @@ export function authErrorMessage(code: string): string {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<BloomUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    return onAuthStateChanged(auth, (u) => {
-      setUser(u);
-      setLoading(false);
+    // Начальное состояние из персистентного authStore (localStorage).
+    setUser((pb.authStore.record as BloomUser) ?? null);
+    setLoading(false);
+    // Подписка на изменения сессии (вход/выход/обновление токена).
+    return pb.authStore.onChange((_token, record) => {
+      setUser((record as BloomUser) ?? null);
     });
   }, []);
 
   async function register(email: string, password: string) {
-    await createUserWithEmailAndPassword(auth, email.trim(), password);
+    const e = email.trim();
+    await pb.collection(USERS).create({ email: e, password, passwordConfirm: password });
+    await pb.collection(USERS).authWithPassword(e, password);
   }
 
   async function login(email: string, password: string) {
-    await signInWithEmailAndPassword(auth, email.trim(), password);
+    await pb.collection(USERS).authWithPassword(email.trim(), password);
   }
 
   async function logout() {
-    await signOut(auth);
+    pb.authStore.clear();
   }
 
   async function resetPassword(email: string) {
-    await sendPasswordResetEmail(auth, email.trim());
+    await pb.collection(USERS).requestPasswordReset(email.trim());
   }
 
   /**
-   * Смена пароля. Firebase требует «свежий» вход, поэтому сначала
-   * переаутентифицируемся текущим паролем, затем меняем на новый.
+   * Смена пароля. PocketBase требует текущий пароль (`oldPassword`) и
+   * инвалидирует токен после смены, поэтому повторно авторизуемся новым паролем.
    */
   async function changePassword(currentPassword: string, newPassword: string) {
-    const current = auth.currentUser;
-    if (!current || !current.email) {
+    const current = pb.authStore.record;
+    if (!current?.id || !current.email) {
       throw new Error("Нет активной сессии");
     }
-    const credential = EmailAuthProvider.credential(current.email, currentPassword);
-    await reauthenticateWithCredential(current, credential);
-    await updatePassword(current, newPassword);
+    await pb.collection(USERS).update(current.id, {
+      oldPassword: currentPassword,
+      password: newPassword,
+      passwordConfirm: newPassword,
+    });
+    await pb.collection(USERS).authWithPassword(current.email as string, newPassword);
   }
 
   const value: AuthContextValue = {

@@ -1,9 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from "firebase/auth";
 import Motif from "@/components/Motif";
-import { auth } from "@/lib/firebase";
+import { pb, USERS, type BloomUser } from "@/lib/pb";
 import { money } from "@/lib/data";
 import {
   AdminProduct,
@@ -18,7 +17,7 @@ import {
   deleteProduct,
   uploadProductImage,
   deleteProductImage,
-  isAdminUser,
+  isCurrentUserAdmin,
 } from "@/lib/products";
 
 const MOTIF_LABELS: Record<string, string> = {
@@ -187,7 +186,7 @@ const ghostBtn: React.CSSProperties = {
 };
 
 export default function AdminPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<BloomUser | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [authReady, setAuthReady] = useState(false);
   const [email, setEmail] = useState("");
@@ -209,11 +208,11 @@ export default function AdminPage() {
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    return onAuthStateChanged(auth, async (u) => {
-      setUser(u);
-      if (u) {
+    async function evaluate(rec: BloomUser | null) {
+      setUser(rec);
+      if (rec) {
         try {
-          setIsAdmin(await isAdminUser(u.uid));
+          setIsAdmin(await isCurrentUserAdmin());
         } catch {
           setIsAdmin(false);
         }
@@ -221,6 +220,10 @@ export default function AdminPage() {
         setIsAdmin(false);
       }
       setAuthReady(true);
+    }
+    void evaluate((pb.authStore.record as BloomUser) ?? null);
+    return pb.authStore.onChange((_token, record) => {
+      void evaluate((record as BloomUser) ?? null);
     });
   }, []);
 
@@ -257,8 +260,8 @@ export default function AdminPage() {
     setLoggingIn(true);
     setLoginError("");
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
-      // onAuthStateChanged выставит user и откроет админку.
+      await pb.collection(USERS).authWithPassword(email.trim(), password);
+      // authStore.onChange выставит user и откроет админку.
     } catch {
       setLoginError("Неверный email или пароль");
     } finally {
@@ -267,7 +270,7 @@ export default function AdminPage() {
   }
 
   async function handleLogout() {
-    await signOut(auth);
+    pb.authStore.clear();
     setEmail("");
     setPassword("");
     cancelForm();
