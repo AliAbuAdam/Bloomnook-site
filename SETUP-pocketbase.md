@@ -57,6 +57,31 @@ node scripts/pb-setup.mjs
 
 - **Демо-товары:** `PB_URL=… PB_SUPERUSER_EMAIL=… PB_SUPERUSER_PASSWORD=… node scripts/seed.mjs`
 
+## 3.1. Вход через Яндекс ID (опционально)
+
+На сайте есть кнопка «Войти с Яндекс ID». Чтобы она заработала, нужно один раз
+настроить OAuth2-провайдер — секрет хранится на сервере PocketBase, в браузер не
+попадает.
+
+1. **Зарегистрировать приложение** на <https://oauth.yandex.ru> → «Создать приложение»:
+   - Платформа — **Веб-сервисы**.
+   - **Redirect URI:** `https://api.bloomnook.ru/api/oauth2-redirect`
+     (это эндпоинт PocketBase, не адрес сайта).
+   - Доступы (scopes): **«Доступ к адресу электронной почты»** (`login:email`) и
+     «Доступ к имени, фамилии и полу» (`login:info`). Email обязателен — без него
+     PocketBase не создаст запись в коллекции `users`.
+   - Сохранить **ClientID** и **Client secret**.
+2. **Включить провайдер в PocketBase** (в версии 0.23+ OAuth2 настраивается внутри
+   auth-коллекции, а НЕ в глобальных Settings): дашборд `https://api.bloomnook.ru/_/` →
+   **Collections** → коллекция **`users`** → шестерёнка (Edit collection) →
+   вкладка **Options** → секция **OAuth2** → включить → **+ Add provider** →
+   **Yandex** → вставить Client ID и Client secret → **Save**.
+3. Там же убедиться, что у `users` задано `createRule`, позволяющее регистрацию новых
+   пользователей (иначе первый вход через Яндекс не создаст запись).
+
+Для локальной разработки зарегистрируйте отдельное приложение с redirect
+`http://127.0.0.1:8090/api/oauth2-redirect`.
+
 ## 4. Переключить сайт
 
 1. В `.env.local` (и в окружении сборки GitHub Pages, если задаёте там) укажите

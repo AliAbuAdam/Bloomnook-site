@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth, authErrorMessage } from "@/contexts/AuthContext";
 import ConsentCheckbox from "./ConsentCheckbox";
+import YandexLoginButton from "./YandexLoginButton";
 import { Close } from "./icons";
 
 type Mode = "login" | "register" | "reset";
@@ -43,6 +44,15 @@ const linkBtn: React.CSSProperties = {
   fontFamily: "inherit",
 };
 
+/**
+ * Пользователь закрыл popup Яндекса, не завершив вход. PocketBase SDK кидает в
+ * этом случае обычную ошибку — отличаем её по тексту, чтобы не пугать юзера.
+ */
+function isPopupClosed(err: unknown): boolean {
+  const msg = (err as { message?: string })?.message?.toLowerCase() ?? "";
+  return msg.includes("popup") || msg.includes("closed") || msg.includes("cancel");
+}
+
 const TITLES: Record<Mode, string> = {
   login: "Вход",
   register: "Регистрация",
@@ -50,12 +60,13 @@ const TITLES: Record<Mode, string> = {
 };
 
 export default function AuthModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { login, register, resetPassword } = useAuth();
+  const { login, register, resetPassword, loginWithYandex } = useAuth();
   const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [consent, setConsent] = useState(false);
+  const [yandexConsent, setYandexConsent] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
@@ -76,6 +87,7 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
       setPassword("");
       setConfirm("");
       setConsent(false);
+      setYandexConsent(false);
       setError("");
       setNotice("");
       setBusy(false);
@@ -89,6 +101,7 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
     setPassword("");
     setConfirm("");
     setConsent(false);
+    setYandexConsent(false);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -119,6 +132,28 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
         setNotice("Письмо для сброса пароля отправлено. Проверьте почту.");
       }
     } catch (err) {
+      setError(authErrorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleYandex() {
+    setError("");
+    setNotice("");
+
+    if (!yandexConsent) {
+      setError("Подтвердите согласие на обработку персональных данных");
+      return;
+    }
+
+    setBusy(true);
+    try {
+      await loginWithYandex();
+      onClose();
+    } catch (err) {
+      // Закрытие popup пользователем — не ошибка, ничего не показываем.
+      if (isPopupClosed(err)) return;
       setError(authErrorMessage(err));
     } finally {
       setBusy(false);
@@ -238,6 +273,21 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
                 : "Отправить письмо"}
             </button>
           </form>
+
+          {/* Вход через Яндекс ID — в режимах вход/регистрация (не при сбросе пароля) */}
+          {mode !== "reset" && (
+            <div style={{ marginTop: 18 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "2px 0 16px", color: "var(--muted)", fontSize: 12.5 }}>
+                <span style={{ flex: 1, height: 1, background: "var(--line)" }} />
+                или
+                <span style={{ flex: 1, height: 1, background: "var(--line)" }} />
+              </div>
+              <div style={{ marginBottom: 14 }}>
+                <ConsentCheckbox checked={yandexConsent} onChange={setYandexConsent} id="yandex-consent" />
+              </div>
+              <YandexLoginButton onClick={handleYandex} disabled={busy || !yandexConsent} busy={busy} />
+            </div>
+          )}
 
           {/* Переключение режимов */}
           <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 10, fontSize: 13.5, color: "var(--muted)" }}>

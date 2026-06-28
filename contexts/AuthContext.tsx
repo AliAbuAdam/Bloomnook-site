@@ -9,6 +9,8 @@ interface AuthContextValue {
   loading: boolean;
   register: (email: string, password: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
+  /** Вход/регистрация через Яндекс ID (OAuth2-провайдер PocketBase). */
+  loginWithYandex: () => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
@@ -69,6 +71,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await pb.collection(USERS).authWithPassword(email.trim(), password);
   }
 
+  /**
+   * Вход через Яндекс ID. Открывает popup Яндекса; PocketBase сам обменивает
+   * код на токен (client_secret хранится на сервере), создаёт/находит запись в
+   * `users` и кладёт сессию в authStore. Подписка onChange выше обновит `user`.
+   */
+  async function loginWithYandex() {
+    await pb.collection(USERS).authWithOAuth2({ provider: "yandex" });
+  }
+
   async function logout() {
     pb.authStore.clear();
   }
@@ -99,6 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loading,
     register,
     login,
+    loginWithYandex,
     logout,
     resetPassword,
     changePassword,
