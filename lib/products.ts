@@ -166,9 +166,15 @@ function inputFromDoc(data: Record<string, unknown>): ProductInput {
   };
 }
 
-/** Fetch all products ordered by their `order` field. */
+/**
+ * Fetch all products ordered by their `order` field.
+ *
+ * `requestKey: null` отключает авто-отмену PocketBase: на главной список
+ * запрашивают сразу несколько компонентов (категории и «Хиты сезона»),
+ * и без этого SDK отменял бы один из одинаковых параллельных запросов.
+ */
 export async function fetchProducts(): Promise<AdminProduct[]> {
-  const rows = await pb.collection(PRODUCTS).getFullList({ sort: "order" });
+  const rows = await pb.collection(PRODUCTS).getFullList({ sort: "order", requestKey: null });
   return rows.map((r) => ({ id: r.id, ...inputFromDoc(r) }));
 }
 

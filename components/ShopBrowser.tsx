@@ -102,6 +102,13 @@ export default function ShopBrowser({ fallback }: { fallback: Product[] }) {
     };
   }, [filtersOpen]);
 
+  // Предвыбор категории из URL (?cat=…) — например, при переходе с карточки
+  // категории на главной. Делается после монтирования, чтобы не ломать гидрацию.
+  useEffect(() => {
+    const cat = new URLSearchParams(window.location.search).get("cat");
+    if (cat) setCats(new Set([cat]));
+  }, []);
+
   useEffect(() => {
     let alive = true;
     fetchDisplayProducts()

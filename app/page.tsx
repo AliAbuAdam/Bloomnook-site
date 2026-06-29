@@ -6,7 +6,7 @@ import LiveCategoryGrid from "@/components/LiveCategoryGrid";
 import SeasonalPromo from "@/components/SeasonalPromo";
 import Faq from "@/components/Faq";
 import { ArrowRight, Leaf, Star, Stars, Truck, Shield, Refresh } from "@/components/icons";
-import { categories, steps, benefits, testimonials, CONTACT } from "@/lib/data";
+import { steps, benefits, testimonials, CONTACT } from "@/lib/data";
 
 const eyebrow: React.CSSProperties = {
   fontSize: 13,
@@ -225,7 +225,7 @@ export default function Home() {
             Категории <span style={{ color: "var(--accent)", fontStyle: "italic" }}>луковиц</span>
           </h2>
         </div>
-        <LiveCategoryGrid fallback={categories} />
+        <LiveCategoryGrid />
       </section>
 
       {/* BESTSELLERS */}
