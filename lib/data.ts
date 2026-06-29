@@ -1,5 +1,28 @@
 export type Motif = "tulip" | "narcissus" | "hyacinth" | "lily" | "crocus";
 
+/** Контакты и соцсети Bloom Nook — единый источник для шапки, подвала и страницы контактов. */
+export const CONTACT = {
+  phone: "+7 925 531-99-38",
+  phoneHref: "tel:+79255319938",
+  email: "hello@bloomnook.ru",
+  /** Чат с менеджером в Telegram. */
+  telegram: "https://t.me/BloomNook1",
+  /** Чат Bloom Nook в Яндексе. */
+  yandex: "https://yandex.ru/chat/p/fa682602-6daa-95ee-799a-39195f7c1358?utm_source=invite",
+} as const;
+
+/** Русское склонение слова «сорт» по числу: 1 сорт, 2 сорта, 5 сортов. */
+export function sortsLabel(n: number): string {
+  const mod100 = n % 100;
+  const mod10 = n % 10;
+  let word = "сортов";
+  if (mod100 < 11 || mod100 > 14) {
+    if (mod10 === 1) word = "сорт";
+    else if (mod10 >= 2 && mod10 <= 4) word = "сорта";
+  }
+  return n + NBSP + word;
+}
+
 /** Срок посадки луковиц. */
 export type Season = "autumn" | "spring";
 

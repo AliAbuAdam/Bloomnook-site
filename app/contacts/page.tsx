@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CONTACT } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Контакты и реквизиты — Bloom Nook",
@@ -9,8 +10,8 @@ export const metadata: Metadata = {
 
 /** Контактные способы связи. */
 const CONTACTS: { label: string; value: string; href?: string }[] = [
-  { label: "Телефон", value: "+7 495 000-00-00", href: "tel:+74950000000" },
-  { label: "Email", value: "hello@bloomnook.ru", href: "mailto:hello@bloomnook.ru" },
+  { label: "Телефон", value: CONTACT.phone, href: CONTACT.phoneHref },
+  { label: "Email", value: CONTACT.email, href: `mailto:${CONTACT.email}` },
   { label: "Доставка", value: "По всей России через Ozon" },
 ];
 

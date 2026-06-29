@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import footerLogo from "@/public/footer_logo.svg";
 import { Telegram, Yandex } from "./icons";
+import { CONTACT } from "@/lib/data";
 
 const social: React.CSSProperties = {
   width: 38,
@@ -33,10 +34,10 @@ export default function Footer() {
               <a href="#" className="bn-social" style={{ ...social, fontSize: 12, fontWeight: 700 }}>
                 VK
               </a>
-              <a href="#" className="bn-social" style={social}>
+              <a href={CONTACT.telegram} target="_blank" rel="noopener noreferrer" aria-label="Чат в Telegram" className="bn-social" style={social}>
                 <Telegram size={17} />
               </a>
-              <a href="#" className="bn-social" style={social}>
+              <a href={CONTACT.yandex} target="_blank" rel="noopener noreferrer" aria-label="Чат в Яндексе" className="bn-social" style={social}>
                 <Yandex size={19} />
               </a>
             </div>
@@ -78,8 +79,8 @@ export default function Footer() {
           <div>
             <h4 style={colTitle}>Контакты</h4>
             <div style={{ ...colList, opacity: 0.82 }}>
-              <span>+7 495 000-00-00</span>
-              <span>hello@bloomnook.ru</span>
+              <a href={CONTACT.phoneHref} className="bn-foot-link" style={colLink}>{CONTACT.phone}</a>
+              <a href={`mailto:${CONTACT.email}`} className="bn-foot-link" style={colLink}>{CONTACT.email}</a>
               <span>Россия, доставка по всей стране</span>
               <Link href="/contacts" className="bn-foot-link" style={{ ...colLink, opacity: 1, fontWeight: 600 }}>
                 Контакты и реквизиты

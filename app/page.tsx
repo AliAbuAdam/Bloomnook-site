@@ -1,12 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
-import Motif from "@/components/Motif";
 import heroTulip from "@/public/hero-tulip.jpg";
 import LiveProductGrid from "@/components/LiveProductGrid";
+import LiveCategoryGrid from "@/components/LiveCategoryGrid";
 import SeasonalPromo from "@/components/SeasonalPromo";
 import Faq from "@/components/Faq";
 import { ArrowRight, Leaf, Star, Stars, Truck, Shield, Refresh } from "@/components/icons";
-import { categories, steps, benefits, testimonials } from "@/lib/data";
+import { categories, steps, benefits, testimonials, CONTACT } from "@/lib/data";
 
 const eyebrow: React.CSSProperties = {
   fontSize: 13,
@@ -225,31 +225,7 @@ export default function Home() {
             Категории <span style={{ color: "var(--accent)", fontStyle: "italic" }}>луковиц</span>
           </h2>
         </div>
-        <div className="bn-g-cats" style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 18 }}>
-          {categories.map((cat) => (
-            <Link
-              key={cat.name}
-              href="/shop"
-              className="bn-cat"
-              style={{
-                cursor: "pointer",
-                background: "var(--cream)",
-                border: "1px solid var(--line)",
-                borderRadius: 18,
-                padding: "24px 14px",
-                textAlign: "center",
-                textDecoration: "none",
-                color: "inherit",
-              }}
-            >
-              <div style={{ height: 78, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
-                <Motif href={cat.useHref} strokeWidth={3} style={{ width: "auto", height: 78 }} />
-              </div>
-              <div style={{ fontWeight: 700, fontSize: 15 }}>{cat.name}</div>
-              <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 3 }}>{cat.count}</div>
-            </Link>
-          ))}
-        </div>
+        <LiveCategoryGrid fallback={categories} />
       </section>
 
       {/* BESTSELLERS */}
@@ -449,7 +425,9 @@ export default function Home() {
               Наш агроном поможет подобрать сорт и расскажет о посадке. Отвечаем быстро.
             </p>
             <a
-              href="#"
+              href={CONTACT.telegram}
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
