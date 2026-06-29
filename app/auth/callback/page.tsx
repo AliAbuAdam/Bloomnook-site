@@ -21,13 +21,19 @@ export default function YandexCallbackPage() {
       const code = params.get("code");
       const state = params.get("state");
       const yandexError = params.get("error");
+      const yandexErrorDesc = params.get("error_description");
 
       const raw = localStorage.getItem(YANDEX_OAUTH_KEY);
       localStorage.removeItem(YANDEX_OAUTH_KEY);
 
-      // Пользователь отказал в доступе на стороне Яндекса.
+      // Яндекс отклонил авторизацию (отказ пользователя или несоответствие прав).
+      // Показываем реальный текст, чтобы было видно причину (напр. invalid_scope).
       if (yandexError) {
-        setError("Вход через Яндекс отменён.");
+        setError(
+          yandexErrorDesc
+            ? `Яндекс отклонил вход: ${yandexErrorDesc} (${yandexError})`
+            : `Яндекс отклонил вход: ${yandexError}`,
+        );
         return;
       }
       if (!code || !raw) {
