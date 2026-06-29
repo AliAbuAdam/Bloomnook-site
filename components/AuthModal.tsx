@@ -44,15 +44,6 @@ const linkBtn: React.CSSProperties = {
   fontFamily: "inherit",
 };
 
-/**
- * Пользователь закрыл popup Яндекса, не завершив вход. PocketBase SDK кидает в
- * этом случае обычную ошибку — отличаем её по тексту, чтобы не пугать юзера.
- */
-function isPopupClosed(err: unknown): boolean {
-  const msg = (err as { message?: string })?.message?.toLowerCase() ?? "";
-  return msg.includes("popup") || msg.includes("closed") || msg.includes("cancel");
-}
-
 const TITLES: Record<Mode, string> = {
   login: "Вход",
   register: "Регистрация",
@@ -149,13 +140,10 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
 
     setBusy(true);
     try {
+      // Redirect-режим: уводит браузер на oauth.yandex, возврат — на /auth/callback.
       await loginWithYandex();
-      onClose();
     } catch (err) {
-      // Закрытие popup пользователем — не ошибка, ничего не показываем.
-      if (isPopupClosed(err)) return;
       setError(authErrorMessage(err));
-    } finally {
       setBusy(false);
     }
   }

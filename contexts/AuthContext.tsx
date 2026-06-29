@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { pb, USERS, type BloomUser } from "@/lib/pb";
+import { pb, USERS, YANDEX_OAUTH_KEY, type BloomUser } from "@/lib/pb";
 
 interface AuthContextValue {
   user: BloomUser | null;
@@ -72,12 +72,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   /**
-   * Вход через Яндекс ID. Открывает popup Яндекса; PocketBase сам обменивает
-   * код на токен (client_secret хранится на сервере), создаёт/находит запись в
-   * `users` и кладёт сессию в authStore. Подписка onChange выше обновит `user`.
+   * Вход через Яндекс ID — redirect-режим (без popup и realtime, надёжно для
+   * статического сайта и пользователей с антивирусами/блокировщиками).
+   *
+   * Запрашиваем у PocketBase authURL + PKCE-параметры, сохраняем их в
+   * localStorage и уводим браузер на страницу авторизации Яндекса. После
+   * подтверждения Яндекс вернёт на /auth/callback, где обмен завершит
+   * `authWithOAuth2Code` (см. app/auth/callback/page.tsx). redirect_uri ведёт на
+   * НАШ сайт, поэтому именно его нужно прописать в кабинете Яндекс OAuth.
    */
   async function loginWithYandex() {
-    await pb.collection(USERS).authWithOAuth2({ provider: "yandex" });
+    const methods = await pb.collection(USERS).listAuthMethods();
+    const provider = methods.oauth2?.providers?.find((p) => p.name === "yandex");
+    if (!provider) {
+      throw new Error("Провайдер Яндекс не настроен в PocketBase");
+    }
+    const redirectUrl = `${window.location.origin}/auth/callback/`;
+    localStorage.setItem(
+      YANDEX_OAUTH_KEY,
+      JSON.stringify({ state: provider.state, codeVerifier: provider.codeVerifier, redirectUrl }),
+    );
+    // provider.authURL заканчивается на "redirect_uri=" — дописываем наш адрес.
+    window.location.href = provider.authURL + encodeURIComponent(redirectUrl);
   }
 
   async function logout() {

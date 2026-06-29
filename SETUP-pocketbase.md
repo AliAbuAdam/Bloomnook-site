@@ -65,8 +65,10 @@ node scripts/pb-setup.mjs
 
 1. **Зарегистрировать приложение** на <https://oauth.yandex.ru> → «Создать приложение»:
    - Платформа — **Веб-сервисы**.
-   - **Redirect URI:** `https://api.bloomnook.ru/api/oauth2-redirect`
-     (это эндпоинт PocketBase, не адрес сайта).
+   - **Redirect URI** (сайт использует redirect-режим, поэтому адрес ведёт на САЙТ,
+     а не на PocketBase; со слешем в конце, как требует `trailingSlash`):
+     - прод: `https://bloomnook.ru/auth/callback/`
+     - локально (для разработки): `http://localhost:3001/auth/callback/`
    - Доступы (scopes): **«Доступ к адресу электронной почты»** (`login:email`) и
      «Доступ к имени, фамилии и полу» (`login:info`). Email обязателен — без него
      PocketBase не создаст запись в коллекции `users`.
@@ -79,8 +81,9 @@ node scripts/pb-setup.mjs
 3. Там же убедиться, что у `users` задано `createRule`, позволяющее регистрацию новых
    пользователей (иначе первый вход через Яндекс не создаст запись).
 
-Для локальной разработки зарегистрируйте отдельное приложение с redirect
-`http://127.0.0.1:8090/api/oauth2-redirect`.
+Обмен кода на токен делает PocketBase (client_secret хранится на сервере); сайт лишь
+передаёт ему код со страницы `/auth/callback`. Если меняете домен сайта — обновите
+Redirect URI в кабинете Яндекса.
 
 ## 4. Переключить сайт
 

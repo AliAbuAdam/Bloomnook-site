@@ -10,6 +10,13 @@ import PocketBase, { type RecordModel } from "pocketbase";
  */
 export const pb = new PocketBase(process.env.NEXT_PUBLIC_PB_URL || "http://127.0.0.1:8090");
 
+/**
+ * Ключ localStorage для PKCE-параметров входа через Яндекс (state + codeVerifier
+ * + redirectUrl), сохраняемых между уходом на oauth.yandex и возвратом на
+ * /auth/callback. Используется в AuthContext и на странице callback.
+ */
+export const YANDEX_OAUTH_KEY = "bn:yandex-oauth";
+
 /** Имена коллекций PocketBase. */
 export const USERS = "users";
 export const PRODUCTS = "products";
