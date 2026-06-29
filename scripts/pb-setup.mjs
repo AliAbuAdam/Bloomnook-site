@@ -127,4 +127,21 @@ await ensure("orders", {
   ],
 });
 
+// content — редактируемые текстовые разделы сайта (отзывы, акция, FAQ).
+// По одной записи на раздел: key (уникальный) + data (JSON).
+// Чтение публичное, запись — только админам.
+await ensure("content", {
+  type: "base",
+  listRule: "",
+  viewRule: "",
+  createRule: IS_ADMIN,
+  updateRule: IS_ADMIN,
+  deleteRule: IS_ADMIN,
+  fields: [
+    { name: "key", type: "text", required: true },
+    { name: "data", type: "json", maxSize: 2000000 },
+  ],
+  indexes: ["CREATE UNIQUE INDEX `idx_content_key` ON `content` (`key`)"],
+});
+
 console.log("Готово. Схема PocketBase настроена.");

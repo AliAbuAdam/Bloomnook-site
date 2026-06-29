@@ -1,11 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Minus } from "./icons";
-import { faqs } from "@/lib/data";
+import { fetchFaq, DEFAULT_FAQ } from "@/lib/content";
+import type { Faq as FaqItem } from "@/lib/data";
 
 export default function Faq() {
   const [open, setOpen] = useState(0);
+  const [faqs, setFaqs] = useState<FaqItem[]>(DEFAULT_FAQ);
+
+  useEffect(() => {
+    let alive = true;
+    fetchFaq()
+      .then((items) => {
+        if (alive) setFaqs(items);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>

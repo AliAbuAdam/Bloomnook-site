@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Motif from "./Motif";
 import { ArrowRight } from "./icons";
-
-const TARGET = new Date("2026-10-20T09:00:00").getTime();
+import { fetchPromo, DEFAULT_PROMO, type PromoContent } from "@/lib/content";
 
 function pad(n: number) {
   return String(n).padStart(2, "0");
@@ -47,10 +46,24 @@ const colon: React.CSSProperties = {
 
 export default function SeasonalPromo() {
   const [t, setT] = useState({ days: "00", hours: "00", mins: "00", secs: "00" });
+  const [promo, setPromo] = useState<PromoContent>(DEFAULT_PROMO);
 
   useEffect(() => {
+    let alive = true;
+    fetchPromo()
+      .then((p) => {
+        if (alive) setPromo(p);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const target = new Date(promo.deadline).getTime();
     const tick = () => {
-      let ms = Math.max(0, TARGET - Date.now());
+      let ms = Number.isFinite(target) ? Math.max(0, target - Date.now()) : 0;
       const dd = Math.floor(ms / 864e5);
       ms -= dd * 864e5;
       const hh = Math.floor(ms / 36e5);
@@ -63,7 +76,7 @@ export default function SeasonalPromo() {
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [promo.deadline]);
 
   return (
     <section className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "72px 32px" }}>
@@ -89,17 +102,18 @@ export default function SeasonalPromo() {
         </div>
         <div style={{ position: "relative", color: "#fff" }}>
           <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", opacity: 0.8 }}>
-            Ограниченное предложение
+            {promo.eyebrow}
           </span>
           <h2 className="bn-h" style={{ fontSize: "clamp(30px, 5vw, 46px)", fontWeight: 600, margin: "12px 0 8px" }}>
-            Осенняя <span style={{ fontStyle: "italic", color: "#CFE3C6" }}>посадка</span>
+            {promo.titleLead}{promo.titleAccent ? " " : ""}
+            {promo.titleAccent && <span style={{ fontStyle: "italic", color: "#CFE3C6" }}>{promo.titleAccent}</span>}
           </h2>
           <p style={{ fontSize: 17, opacity: 0.85, margin: "0 0 26px", maxWidth: 380 }}>
-            Скидки до 30% на луковицы весеннего цветения. Успейте посадить до холодов.
+            {promo.text}
           </p>
           <div style={{ display: "flex", gap: 14 }}>
             <Link
-              href="/shop"
+              href={promo.ctaHref || "/shop"}
               className="bn-hover-fade"
               style={{
                 cursor: "pointer",
@@ -115,7 +129,7 @@ export default function SeasonalPromo() {
                 gap: 9,
               }}
             >
-              К акции <ArrowRight size={17} strokeWidth={2} />
+              {promo.ctaText} <ArrowRight size={17} strokeWidth={2} />
             </Link>
           </div>
         </div>
@@ -134,7 +148,7 @@ export default function SeasonalPromo() {
           >
             <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#9FE5A9", animation: "bnblink 1.3s ease-in-out infinite" }} />
             <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#fff", whiteSpace: "nowrap" }}>
-              До конца акции
+              {promo.badge}
             </span>
           </div>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 8, justifyContent: "flex-start" }}>
