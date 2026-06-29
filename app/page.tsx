@@ -5,8 +5,9 @@ import LiveProductGrid from "@/components/LiveProductGrid";
 import LiveCategoryGrid from "@/components/LiveCategoryGrid";
 import SeasonalPromo from "@/components/SeasonalPromo";
 import Faq from "@/components/Faq";
+import LiveTestimonials from "@/components/LiveTestimonials";
 import { ArrowRight, Leaf, Star, Stars, Truck, Shield, Refresh } from "@/components/icons";
-import { steps, benefits, testimonials, CONTACT } from "@/lib/data";
+import { steps, benefits, CONTACT } from "@/lib/data";
 
 const eyebrow: React.CSSProperties = {
   fontSize: 13,
@@ -335,50 +336,7 @@ export default function Home() {
             Что говорят <span style={{ color: "var(--accent)", fontStyle: "italic" }}>садоводы</span>
           </h2>
         </div>
-        <div className="bn-g-3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24 }}>
-          {testimonials.map((t) => (
-            <div
-              key={t.name}
-              style={{
-                background: "#fff",
-                border: "1px solid var(--line)",
-                borderRadius: 20,
-                padding: 30,
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-                <Stars size={16} />
-                <span style={{ fontWeight: 800, fontSize: 14 }}>{t.rating}</span>
-              </div>
-              <h3 style={{ fontSize: 18, fontWeight: 700, margin: "0 0 10px" }}>{t.title}</h3>
-              <p style={{ fontSize: 14.5, lineHeight: 1.65, color: "var(--muted)", margin: "0 0 22px", flex: 1 }}>{t.text}</p>
-              <div style={{ display: "flex", alignItems: "center", gap: 13, borderTop: "1px solid var(--line)", paddingTop: 18 }}>
-                <span
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: "50%",
-                    background: "var(--sage)",
-                    color: "var(--green)",
-                    fontWeight: 800,
-                    fontSize: 15,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {t.initials}
-                </span>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: 15 }}>{t.name}</div>
-                  <div style={{ fontSize: 13, color: "var(--muted)" }}>{t.city}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <LiveTestimonials />
       </section>
 
       {/* FAQ */}

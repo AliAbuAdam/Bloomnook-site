@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Motif from "@/components/Motif";
+import ContentManager from "@/components/ContentManager";
 import { pb, USERS, type BloomUser } from "@/lib/pb";
 import { money } from "@/lib/data";
 import {
@@ -188,6 +189,7 @@ const ghostBtn: React.CSSProperties = {
 export default function AdminPage() {
   const [user, setUser] = useState<BloomUser | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [tab, setTab] = useState<"products" | "content">("products");
   const [authReady, setAuthReady] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -456,7 +458,7 @@ export default function AdminPage() {
     <main className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "48px 32px 80px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 8, flexWrap: "wrap" }}>
         <h1 className="bn-h" style={{ fontSize: "clamp(26px, 5vw, 36px)", fontWeight: 600, margin: 0 }}>
-          Товары
+          Админка
         </h1>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 13, color: "var(--muted)" }}>{user?.email}</span>
@@ -465,6 +467,21 @@ export default function AdminPage() {
           </button>
         </div>
       </div>
+
+      {/* ВКЛАДКИ: товары / текстовые разделы сайта */}
+      <div style={{ display: "flex", gap: 8, margin: "16px 0 24px", flexWrap: "wrap" }}>
+        <button style={tab === "products" ? primaryBtn : ghostBtn} onClick={() => setTab("products")}>
+          Товары
+        </button>
+        <button style={tab === "content" ? primaryBtn : ghostBtn} onClick={() => setTab("content")}>
+          Разделы сайта
+        </button>
+      </div>
+
+      {tab === "content" && <ContentManager />}
+
+      {tab === "products" && (
+      <>
       <p style={{ fontSize: 14, color: "var(--muted)", margin: "0 0 24px" }}>
         Изменения сохраняются в базе и сразу отражаются на витрине (главная и магазин).
       </p>
@@ -837,6 +854,8 @@ export default function AdminPage() {
       <p style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 24, lineHeight: 1.6 }}>
         Вход защищён авторизацией, запись в каталог доступна только администраторам.
       </p>
+      </>
+      )}
     </main>
   );
 }
