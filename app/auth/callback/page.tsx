@@ -14,6 +14,7 @@ import { authErrorMessage } from "@/contexts/AuthContext";
  */
 export default function YandexCallbackPage() {
   const [error, setError] = useState("");
+  const [detail, setDetail] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -51,6 +52,11 @@ export default function YandexCallbackPage() {
         window.location.replace("/account/");
       } catch (err) {
         setError(authErrorMessage(err));
+        // Технические детали ответа PocketBase — чтобы видеть точную причину
+        // (например, какой именно код валидации по email).
+        const e = err as { response?: { data?: unknown }; message?: string };
+        const data = e?.response?.data;
+        setDetail(data && Object.keys(data).length ? JSON.stringify(data) : e?.message ?? "");
       }
     })();
   }, []);
@@ -62,7 +68,28 @@ export default function YandexCallbackPage() {
           <h1 className="bn-h" style={{ fontSize: 24, fontWeight: 600, marginBottom: 12 }}>
             Не удалось войти
           </h1>
-          <p style={{ color: "var(--muted)", fontSize: 14, marginBottom: 24 }}>{error}</p>
+          <p style={{ color: "var(--muted)", fontSize: 14, marginBottom: detail ? 12 : 24 }}>{error}</p>
+          {detail && (
+            <pre
+              style={{
+                maxWidth: "100%",
+                overflowX: "auto",
+                textAlign: "left",
+                fontSize: 12,
+                lineHeight: 1.5,
+                color: "var(--muted)",
+                background: "var(--surface, #f4f6f2)",
+                border: "1px solid var(--line)",
+                borderRadius: 10,
+                padding: "12px 14px",
+                marginBottom: 24,
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-word",
+              }}
+            >
+              {detail}
+            </pre>
+          )}
           <Link
             href="/"
             style={{
