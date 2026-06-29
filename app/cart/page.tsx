@@ -53,9 +53,11 @@ export default function CartPage() {
   const [comment, setComment] = useState("");
   const [consent, setConsent] = useState(false);
 
-  // Подставляем email из аккаунта, пока поле пустое.
+  // Подставляем имя и email из аккаунта, пока поля пустые. Поля остаются
+  // редактируемыми — если получатель другой, имя можно изменить вручную.
   useEffect(() => {
     if (user?.email) setEmail((e) => e || user.email!);
+    if (user?.name) setName((n) => n || user.name!);
   }, [user]);
 
   // Если корзина опустела (не из-за оформления) — возвращаемся к виду корзины.
@@ -409,6 +411,9 @@ function CheckoutForm({
         <div style={{ gridColumn: "1 / -1" }}>
           <label style={fieldLabel}>Имя получателя *</label>
           <input style={fieldInput} value={values.name} onChange={(e) => set.setName(e.target.value)} autoComplete="name" placeholder="Иван Иванов" />
+          <p style={{ fontSize: 12, color: "var(--muted)", margin: "6px 0 0" }}>
+            Если заказ для другого получателя — измените имя.
+          </p>
         </div>
         <div>
           <label style={fieldLabel}>Телефон *</label>

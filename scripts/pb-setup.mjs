@@ -41,7 +41,25 @@ async function ensure(name, spec) {
   console.log(`+ ${name}: создана`);
 }
 
-const usersId = (await pb.collections.getOne("users")).id;
+const usersCollection = await pb.collections.getOne("users");
+const usersId = usersCollection.id;
+
+// Доп. поля профиля в `users`: имя и URL аватара (приходят из Яндекс ID).
+// Идемпотентно — добавляем только отсутствующие, остальные поля сохраняем как есть.
+// `name` в дефолтной auth-коллекции обычно уже есть; `avatarUrl` — текстовый,
+// т.к. аватар Яндекса это внешняя ссылка (а системное поле `avatar` — файл).
+{
+  const have = new Set(usersCollection.fields.map((f) => f.name));
+  const toAdd = [];
+  if (!have.has("name")) toAdd.push({ name: "name", type: "text" });
+  if (!have.has("avatarUrl")) toAdd.push({ name: "avatarUrl", type: "text" });
+  if (toAdd.length === 0) {
+    console.log("= users: поля name/avatarUrl уже есть");
+  } else {
+    await pb.collections.update(usersId, { fields: [...usersCollection.fields, ...toAdd] });
+    console.log(`+ users: добавлены поля ${toAdd.map((f) => f.name).join(", ")}`);
+  }
+}
 
 // Правило «текущий пользователь — админ» (есть запись в admins на него).
 const IS_ADMIN = '@request.auth.id != "" && @collection.admins.user ?= @request.auth.id';

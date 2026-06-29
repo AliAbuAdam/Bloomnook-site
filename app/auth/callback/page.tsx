@@ -46,7 +46,23 @@ export default function YandexCallbackPage() {
         if (!state || state !== saved.state) {
           throw new Error("state mismatch");
         }
-        await pb.collection(USERS).authWithOAuth2Code("yandex", code, saved.codeVerifier, saved.redirectUrl);
+        const auth = await pb.collection(USERS).authWithOAuth2Code("yandex", code, saved.codeVerifier, saved.redirectUrl);
+        // Имя и аватар приходят от Яндекса в auth.meta (не в записи), а PocketBase
+        // по умолчанию сохраняет только email. Дописываем их в запись пользователя,
+        // чтобы они были доступны между сессиями и на других устройствах. Сбой
+        // здесь не должен ломать вход — оборачиваем в try/catch.
+        const meta = auth.meta as { name?: string; avatarURL?: string; avatarUrl?: string } | undefined;
+        const name = meta?.name?.trim();
+        const avatarUrl = (meta?.avatarURL || meta?.avatarUrl)?.trim();
+        const patch: Record<string, string> = {};
+        if (name && auth.record.name !== name) patch.name = name;
+        if (avatarUrl && auth.record.avatarUrl !== avatarUrl) patch.avatarUrl = avatarUrl;
+        if (Object.keys(patch).length > 0) {
+          // update auth-записи обновит и pb.authStore, поэтому UI подхватит имя/аватар.
+          await pb.collection(USERS).update(auth.record.id, patch).catch((e) => {
+            console.warn("Не удалось сохранить имя/аватар из Яндекса:", e);
+          });
+        }
         // Успех — в личный кабинет (replace, чтобы callback не остался в истории).
         window.location.replace("/account/");
       } catch (err) {

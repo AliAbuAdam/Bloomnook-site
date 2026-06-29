@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth, authErrorMessage } from "@/contexts/AuthContext";
 import AuthModal from "@/components/AuthModal";
+import UserAvatar from "@/components/UserAvatar";
+import { displayName } from "@/lib/pb";
 import { fetchUserOrders, type Order } from "@/lib/orders";
 import { money } from "@/lib/data";
 
@@ -152,10 +154,15 @@ export default function AccountPage() {
 
       {/* Профиль */}
       <section style={card}>
-        <h2 className="bn-h" style={{ fontSize: 20, fontWeight: 600, margin: "0 0 4px" }}>
-          Профиль
-        </h2>
-        <p style={{ fontSize: 14, color: "var(--muted)", margin: 0 }}>{user.email}</p>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <UserAvatar user={user} size={56} />
+          <div style={{ minWidth: 0 }}>
+            <h2 className="bn-h" style={{ fontSize: 20, fontWeight: 600, margin: "0 0 2px" }}>
+              {displayName(user)}
+            </h2>
+            <p style={{ fontSize: 14, color: "var(--muted)", margin: 0, wordBreak: "break-all" }}>{user.email}</p>
+          </div>
+        </div>
       </section>
 
       {/* Смена пароля */}

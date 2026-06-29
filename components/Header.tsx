@@ -7,7 +7,9 @@ import headerLogo from "@/public/header_logo.svg";
 import { Search, Heart, Cart, User, Menu, Close } from "./icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
+import { displayName } from "@/lib/pb";
 import AuthModal from "./AuthModal";
+import UserAvatar from "./UserAvatar";
 
 const navLink: React.CSSProperties = {
   cursor: "pointer",
@@ -138,7 +140,7 @@ export default function Header() {
               className="bn-icon-btn"
               style={{ border: "none", background: "none", padding: 0, cursor: "pointer", color: "var(--ink)", display: "flex", alignItems: "center" }}
             >
-              <User />
+              {user ? <UserAvatar user={user} size={30} /> : <User />}
             </button>
             {user && menuOpen && (
               <div
@@ -156,8 +158,14 @@ export default function Header() {
                   zIndex: 55,
                 }}
               >
-                <div style={{ padding: "8px 12px 10px", fontSize: 12.5, color: "var(--muted)", wordBreak: "break-all", borderBottom: "1px solid var(--line)", marginBottom: 6 }}>
-                  {user.email}
+                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px 10px", borderBottom: "1px solid var(--line)", marginBottom: 6 }}>
+                  <UserAvatar user={user} size={36} />
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {displayName(user)}
+                    </div>
+                    <div style={{ fontSize: 12, color: "var(--muted)", wordBreak: "break-all" }}>{user.email}</div>
+                  </div>
                 </div>
                 <Link
                   href="/account"

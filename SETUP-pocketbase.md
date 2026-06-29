@@ -72,7 +72,9 @@ node scripts/pb-setup.mjs
      - локально (для разработки): `http://localhost:3001/auth/callback/`
    - Доступы (scopes): **«Доступ к адресу электронной почты»** (`login:email`) и
      «Доступ к имени, фамилии и полу» (`login:info`). Email обязателен — без него
-     PocketBase не создаст запись в коллекции `users`.
+     PocketBase не создаст запись в коллекции `users`. `login:info` даёт имя и
+     аватар — сайт сохраняет их в поля `name`/`avatarUrl` пользователя и показывает
+     в шапке и личном кабинете (поля создаёт `scripts/pb-setup.mjs`).
    - Сохранить **ClientID** и **Client secret**.
 2. **Включить провайдер в PocketBase** (в версии 0.23+ OAuth2 настраивается внутри
    auth-коллекции, а НЕ в глобальных Settings): дашборд `https://api.bloomnook.ru/_/` →

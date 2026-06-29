@@ -27,9 +27,23 @@ export const ADMINS = "admins";
 /** Пользователь — запись auth-коллекции `users`. */
 export interface BloomUser extends RecordModel {
   email: string;
+  /** Имя из профиля (приходит из Яндекс ID, поле `name` коллекции `users`). */
+  name?: string;
+  /** URL аватара (из Яндекс ID, поле `avatarUrl` коллекции `users`). */
+  avatarUrl?: string;
 }
 
 /** Текущий авторизованный пользователь (или null). */
 export function currentUser(): BloomUser | null {
   return (pb.authStore.record as BloomUser) ?? null;
+}
+
+/**
+ * Отображаемое имя пользователя: имя из профиля, иначе часть email до «@».
+ * Используется в шапке и личном кабинете, чтобы не показывать всем голый email.
+ */
+export function displayName(u: BloomUser | null): string {
+  if (!u) return "";
+  if (u.name && u.name.trim()) return u.name.trim();
+  return u.email ? u.email.split("@")[0] : "";
 }
