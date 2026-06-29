@@ -93,7 +93,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       JSON.stringify({ state: provider.state, codeVerifier: provider.codeVerifier, redirectUrl }),
     );
     // provider.authURL заканчивается на "redirect_uri=" — дописываем наш адрес.
-    window.location.href = provider.authURL + encodeURIComponent(redirectUrl);
+    // force_confirm=yes: Яндекс всегда показывает экран подтверждения с выбором
+    // аккаунта, а не молча логинит текущую сессию браузера (позволяет сменить
+    // аккаунт, напр. если у текущего нет привязанной почты).
+    window.location.href = provider.authURL + encodeURIComponent(redirectUrl) + "&force_confirm=yes";
   }
 
   async function logout() {
