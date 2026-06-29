@@ -92,11 +92,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       YANDEX_OAUTH_KEY,
       JSON.stringify({ state: provider.state, codeVerifier: provider.codeVerifier, redirectUrl }),
     );
+    // PocketBase выдаёт authURL на oauth.yandex.COM, но в России пользователи
+    // залогинены на yandex.RU — это разные cookie-домены, поэтому .com-окно не
+    // видит сессию и требует повторный вход. Переключаем авторизацию на .ru,
+    // чтобы подхватывались уже залогиненные аккаунты (code Яндекса работает на
+    // обоих зеркалах, обмен токена PocketBase выполнит как обычно).
+    const authURL = provider.authURL.replace("oauth.yandex.com", "oauth.yandex.ru");
     // provider.authURL заканчивается на "redirect_uri=" — дописываем наш адрес.
     // force_confirm=yes: Яндекс всегда показывает экран подтверждения с выбором
     // аккаунта, а не молча логинит текущую сессию браузера (позволяет сменить
     // аккаунт, напр. если у текущего нет привязанной почты).
-    window.location.href = provider.authURL + encodeURIComponent(redirectUrl) + "&force_confirm=yes";
+    window.location.href = authURL + encodeURIComponent(redirectUrl) + "&force_confirm=yes";
   }
 
   async function logout() {
