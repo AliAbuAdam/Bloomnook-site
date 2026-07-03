@@ -54,8 +54,9 @@ node scripts/pb-setup.mjs
 ## 9. Приём оплат ЮKassa
 Загрузите хук и задайте секреты (подробно — в `SETUP-pocketbase.md` §3.2):
 ```
-scp deploy/pb_hooks/yookassa.pb.js root@<IP>:/opt/pocketbase/pb_hooks/
-ssh root@<IP> 'chown pocketbase:pocketbase /opt/pocketbase/pb_hooks/yookassa.pb.js'
+# хук состоит из ДВУХ файлов (yookassa.pb.js + yookassa_lib.js) — копируйте оба:
+scp deploy/pb_hooks/*.js root@<IP>:/opt/pocketbase/pb_hooks/
+ssh root@<IP> 'chown pocketbase:pocketbase /opt/pocketbase/pb_hooks/*.js'
 # впишите YOOKASSA_* в /opt/pocketbase/pb.env, затем:
 ssh root@<IP> 'systemctl restart pocketbase'
 ```

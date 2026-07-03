@@ -94,10 +94,13 @@ Redirect URI в кабинете Яндекса.
 ЮKassa хранится на сервере (в РФ) и в браузер не попадает. Хук создаёт платежи и
 принимает webhook о смене статуса.
 
-1. **Загрузить хук на сервер** в каталог `pb_hooks` (PocketBase сам его подхватит):
+1. **Загрузить хук на сервер** в каталог `pb_hooks` (PocketBase сам его подхватит).
+   Хук — это ДВА файла: `yookassa.pb.js` (роуты) и `yookassa_lib.js` (логика; вынесена
+   отдельно, т.к. обработчики routerAdd в PocketBase не видят функции верхнего уровня
+   файла-хука и подключают модуль через `require`). Копируйте оба:
    ```
-   scp deploy/pb_hooks/yookassa.pb.js root@<IP>:/opt/pocketbase/pb_hooks/
-   ssh root@<IP> 'chown pocketbase:pocketbase /opt/pocketbase/pb_hooks/yookassa.pb.js'
+   scp deploy/pb_hooks/*.js root@<IP>:/opt/pocketbase/pb_hooks/
+   ssh root@<IP> 'chown pocketbase:pocketbase /opt/pocketbase/pb_hooks/*.js'
    ```
 2. **Задать секреты** в `/opt/pocketbase/pb.env` (файл-шаблон создаёт `install.sh`,
    права 600). Значения — из личного кабинета ЮKassa (Интеграция → Ключи API):
