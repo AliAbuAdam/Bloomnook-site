@@ -5,10 +5,12 @@ import Link from "next/link";
 import Motif from "@/components/Motif";
 import AuthModal from "@/components/AuthModal";
 import ConsentCheckbox from "@/components/ConsentCheckbox";
-import { Minus, Plus, Close, Truck, Lock, Check } from "@/components/icons";
+import YooKassaWidget from "@/components/YooKassaWidget";
+import { Minus, Plus, Close, Truck, Lock } from "@/components/icons";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { createOrder } from "@/lib/orders";
+import { createPayment } from "@/lib/payments";
 import { money } from "@/lib/data";
 
 const gridCols = "2.4fr 1fr 1.2fr 1fr 40px";
@@ -42,7 +44,8 @@ export default function CartPage() {
   const [authOpen, setAuthOpen] = useState(false);
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState("");
-  const [orderId, setOrderId] = useState<string | null>(null);
+  // Данные для встроенного виджета оплаты (появляются после создания платежа).
+  const [pay, setPay] = useState<{ orderId: string; token: string } | null>(null);
 
   // Контактные данные получателя.
   const [name, setName] = useState("");
@@ -90,6 +93,10 @@ export default function CartPage() {
       setError("Подтвердите согласие на обработку персональных данных.");
       return;
     }
+    if (subtotal <= 0) {
+      setError("Сумма заказа не определена. Уточните наличие и цены у магазина.");
+      return;
+    }
     setPlacing(true);
     setError("");
     try {
@@ -106,11 +113,21 @@ export default function CartPage() {
         address: address.trim(),
         comment: comment.trim(),
       });
-      clear();
-      setOrderId(id);
+      // Создаём платёж ЮKassa и показываем встроенный виджет. Корзину НЕ чистим:
+      // очистка произойдёт на странице /payment/callback после успешной оплаты.
+      const payment = await createPayment(id);
+      if (payment.confirmationUrl) {
+        // Сервер настроен на redirect-сценарий — уводим на страницу оплаты.
+        window.location.href = payment.confirmationUrl;
+        return;
+      }
+      if (!payment.confirmationToken) {
+        throw new Error("ЮKassa не вернула токен подтверждения оплаты.");
+      }
+      setPay({ orderId: id, token: payment.confirmationToken });
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (e) {
-      setError("Не удалось оформить заказ. Попробуйте ещё раз.");
+      setError("Не удалось перейти к оплате. Попробуйте ещё раз.");
       // eslint-disable-next-line no-console
       console.error(e);
     } finally {
@@ -125,13 +142,13 @@ export default function CartPage() {
       <div style={{ background: "var(--sage-2)", borderBottom: "1px solid var(--line)" }}>
         <div className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "48px 32px", textAlign: "center" }}>
           <h1 className="bn-h" style={{ fontSize: "clamp(30px, 6vw, 46px)", fontWeight: 600, margin: 0 }}>
-            {checkout ? "Оформление заказа" : "Корзина"}
+            {pay ? "Оплата заказа" : checkout ? "Оформление заказа" : "Корзина"}
           </h1>
           <div style={{ fontSize: 14, color: "var(--muted)", marginTop: 10 }}>
             <Link href="/" style={{ cursor: "pointer", color: "inherit", textDecoration: "none" }}>
               Главная
             </Link>{" "}
-            /&nbsp; <span style={{ color: "var(--ink)" }}>{checkout ? "Оформление" : "Корзина"}</span>
+            /&nbsp; <span style={{ color: "var(--ink)" }}>{pay ? "Оплата" : checkout ? "Оформление" : "Корзина"}</span>
           </div>
         </div>
       </div>
@@ -140,8 +157,14 @@ export default function CartPage() {
         <div className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "80px 32px", textAlign: "center", color: "var(--muted)" }}>
           Загрузка…
         </div>
-      ) : orderId ? (
-        <OrderSuccess id={orderId} loggedIn={!!user} />
+      ) : pay ? (
+        <PaymentScreen
+          orderId={pay.orderId}
+          token={pay.token}
+          total={subtotal}
+          onError={(m) => setError(m)}
+          error={error}
+        />
       ) : lines.length === 0 ? (
         <EmptyCart />
       ) : (
@@ -332,8 +355,8 @@ export default function CartPage() {
                 fontFamily: "inherit",
               }}
             >
-              {checkout ? <Check size={19} strokeWidth={2.2} /> : <Truck size={19} strokeWidth={1.8} />}
-              {checkout ? (placing ? "Оформляем…" : "Подтвердить заказ") : "Оформить заказ"}
+              {checkout ? <Lock size={17} strokeWidth={2} /> : <Truck size={19} strokeWidth={1.8} />}
+              {checkout ? (placing ? "Переходим к оплате…" : "Перейти к оплате") : "Оформить заказ"}
             </button>
             {!user && !checkout && (
               <div style={{ fontSize: 12.5, color: "var(--muted)", textAlign: "center", marginTop: 12 }}>
@@ -478,51 +501,41 @@ function EmptyCart() {
   );
 }
 
-/** Экран успешного оформления заказа. */
-function OrderSuccess({ id, loggedIn }: { id: string; loggedIn: boolean }) {
+/** Экран оплаты со встроенным виджетом ЮKassa. */
+function PaymentScreen({
+  orderId,
+  token,
+  total,
+  onError,
+  error,
+}: {
+  orderId: string;
+  token: string;
+  total: number;
+  onError: (message: string) => void;
+  error: string;
+}) {
+  // Абсолютный URL страницы возврата после оплаты (работает и локально, и в проде).
+  const returnUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/payment/callback/?order=${orderId}`
+      : `/payment/callback/?order=${orderId}`;
+
   return (
-    <div className="bn-pad" style={{ maxWidth: 640, margin: "0 auto", padding: "72px 32px 96px", textAlign: "center" }}>
-      <span
-        style={{
-          width: 64,
-          height: 64,
-          borderRadius: "50%",
-          background: "var(--sage)",
-          color: "var(--green)",
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: 20,
-        }}
-      >
-        <Check size={30} strokeWidth={2.4} />
-      </span>
-      <h2 className="bn-h" style={{ fontSize: "clamp(24px, 5vw, 32px)", fontWeight: 600, margin: "0 0 10px" }}>
-        Заказ оформлен!
-      </h2>
-      <p style={{ fontSize: 15, color: "var(--muted)", margin: "0 0 6px", lineHeight: 1.6 }}>
-        Спасибо за заказ. Номер: <b style={{ color: "var(--ink)" }}>#{id.slice(0, 8).toUpperCase()}</b>.
-      </p>
-      <p style={{ fontSize: 14.5, color: "var(--muted)", margin: "0 0 28px", lineHeight: 1.6 }}>
-        Мы свяжемся с вами для подтверждения и уточнения доставки.
-      </p>
-      <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-        {loggedIn && (
-          <Link
-            href="/account"
-            className="bn-hover-fade"
-            style={{ background: "var(--accent)", color: "#fff", fontWeight: 700, fontSize: 15, padding: "13px 24px", borderRadius: 999, textDecoration: "none" }}
-          >
-            Мои заказы
-          </Link>
-        )}
-        <Link
-          href="/shop"
-          style={{ border: "1.5px solid var(--line)", color: "var(--ink)", fontWeight: 700, fontSize: 15, padding: "13px 24px", borderRadius: 999, textDecoration: "none" }}
-        >
-          Продолжить покупки
-        </Link>
+    <div className="bn-pad" style={{ maxWidth: 640, margin: "0 auto", padding: "40px 32px 80px" }}>
+      <div style={{ textAlign: "center", marginBottom: 24 }}>
+        <p style={{ fontSize: 15, color: "var(--muted)", margin: "0 0 6px" }}>
+          Заказ <b style={{ color: "var(--ink)" }}>#{orderId.slice(0, 8).toUpperCase()}</b> — к оплате{" "}
+          <b style={{ color: "var(--ink)" }}>{money(total)}</b>
+        </p>
+        <p style={{ fontSize: 13.5, color: "var(--muted)", margin: 0, display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <Lock size={14} /> Оплата защищена ЮKassa
+        </p>
       </div>
+      {error && (
+        <div style={{ color: "#c0392b", fontSize: 13.5, marginBottom: 16, textAlign: "center" }}>{error}</div>
+      )}
+      <YooKassaWidget token={token} returnUrl={returnUrl} onError={onError} />
     </div>
   );
 }

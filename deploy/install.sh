@@ -28,7 +28,27 @@ apt-get update -qq
 apt-get install -y -qq unzip curl >/dev/null
 
 id pocketbase &>/dev/null || useradd --system --home "$PB_DIR" --shell /usr/sbin/nologin pocketbase
-mkdir -p "$PB_DIR"
+mkdir -p "$PB_DIR" "$PB_DIR/pb_hooks"
+
+# Шаблон файла с секретами (переменные окружения для сервиса). Создаём только
+# если его ещё нет, чтобы не затирать уже заданные ключи. Права 600 — секреты.
+if [[ ! -f "$PB_DIR/pb.env" ]]; then
+  cat > "$PB_DIR/pb.env" <<'ENVF'
+# Секреты приёма платежей ЮKassa (см. deploy/pb_hooks/yookassa.pb.js).
+# Заполните значения и выполните: systemctl restart pocketbase
+YOOKASSA_SHOP_ID=
+YOOKASSA_SECRET_KEY=
+YOOKASSA_RECEIPTS_ENABLED=1
+# Код системы налогообложения (1-6). Для АУСН оставьте ПУСТЫМ — валидного кода
+# в фискальном формате нет, система берётся из настроек кабинета/кассы.
+YOOKASSA_TAX_SYSTEM_CODE=
+# Ставка НДС позиций: 1 — без НДС (АУСН/УСН не платят НДС).
+YOOKASSA_VAT_CODE=1
+SITE_URL=https://bloomnook.ru
+ENVF
+  echo "→ Создан шаблон секретов $PB_DIR/pb.env — заполните YOOKASSA_* перед приёмом оплат."
+fi
+chmod 600 "$PB_DIR/pb.env"
 
 echo "→ Скачиваю PocketBase…"
 curl -fsSL -o /tmp/pb.zip \
@@ -49,6 +69,8 @@ Group=pocketbase
 LimitNOFILE=4096
 # Позволяет несуперпользователю слушать порты 80/443.
 AmbientCapabilities=CAP_NET_BIND_SERVICE
+# Секреты (ключи ЮKassa и пр.); "-" — не падать, если файла нет.
+EnvironmentFile=-$PB_DIR/pb.env
 WorkingDirectory=$PB_DIR
 ExecStart=$PB_DIR/pocketbase serve --dir=$PB_DIR/pb_data $API_DOMAIN
 Restart=always
@@ -74,4 +96,11 @@ echo "     systemctl restart pocketbase"
 echo "  2) Дашборд: https://$API_DOMAIN/_/"
 echo "  3) С рабочей машины создайте коллекции:"
 echo "     PB_URL=https://$API_DOMAIN PB_SUPERUSER_EMAIL=… PB_SUPERUSER_PASSWORD=… node scripts/pb-setup.mjs"
-echo "  4) Логи:   journalctl -u pocketbase -f"
+echo "  4) Приём оплат ЮKassa:"
+echo "     - загрузите хук:  scp deploy/pb_hooks/yookassa.pb.js root@<IP>:$PB_DIR/pb_hooks/"
+echo "       chown pocketbase:pocketbase $PB_DIR/pb_hooks/yookassa.pb.js"
+echo "     - впишите ключи в $PB_DIR/pb.env (YOOKASSA_SHOP_ID, YOOKASSA_SECRET_KEY, …)"
+echo "     - systemctl restart pocketbase"
+echo "     - в кабинете ЮKassa → Интеграция → HTTP-уведомления укажите URL"
+echo "       https://$API_DOMAIN/api/yookassa/webhook (события payment.succeeded, payment.canceled)"
+echo "  5) Логи:   journalctl -u pocketbase -f"

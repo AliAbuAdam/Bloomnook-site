@@ -51,11 +51,24 @@ node scripts/pb-setup.mjs
 добавьте `NEXT_PUBLIC_PB_URL = https://api.bloomnook.ru`.
 Запустите деплой (push в `main` или вкладка Actions → Run workflow).
 
-## 9. Проверка
-Откройте сайт: регистрация, вход, добавление в корзину, оформление заказа,
-вход в `/admin` и редактирование товара. В дашборде PocketBase появляются
-записи в `users`, `orders`, `products`.
+## 9. Приём оплат ЮKassa
+Загрузите хук и задайте секреты (подробно — в `SETUP-pocketbase.md` §3.2):
+```
+scp deploy/pb_hooks/yookassa.pb.js root@<IP>:/opt/pocketbase/pb_hooks/
+ssh root@<IP> 'chown pocketbase:pocketbase /opt/pocketbase/pb_hooks/yookassa.pb.js'
+# впишите YOOKASSA_* в /opt/pocketbase/pb.env, затем:
+ssh root@<IP> 'systemctl restart pocketbase'
+```
+В кабинете ЮKassa → HTTP-уведомления укажите
+`https://api.bloomnook.ru/api/yookassa/webhook` (события `payment.succeeded`,
+`payment.canceled`).
 
-## 10. Бэкапы (важно для РФ-хранения)
+## 10. Проверка
+Откройте сайт: регистрация, вход, добавление в корзину, оформление заказа и
+**оплата** (виджет ЮKassa → возврат на `/payment/callback` → статус «Оплачен»),
+вход в `/admin` и редактирование товара. В дашборде PocketBase появляются
+записи в `users`, `orders` (с `paymentId`/`paidAt`), `products`.
+
+## 11. Бэкапы (важно для РФ-хранения)
 Дашборд → Settings → Backups → включите авто-бэкапы и выгрузку в российский
 S3 (Selectel/VK), чтобы и копии оставались в РФ.

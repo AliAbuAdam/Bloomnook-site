@@ -141,9 +141,27 @@ await ensure("orders", {
     { name: "total", type: "number" },
     { name: "status", type: "text" },
     { name: "customer", type: "json", maxSize: 200000 },
+    { name: "paymentId", type: "text" },
+    { name: "paidAt", type: "date" },
     { name: "created", type: "autodate", onCreate: true, onUpdate: false },
   ],
 });
+
+// Идемпотентно добавляем поля оплаты в orders (для существующих баз, где
+// коллекция уже создана без них). paymentId — id платежа ЮKassa, paidAt — время оплаты.
+{
+  const orders = await pb.collections.getOne("orders");
+  const have = new Set(orders.fields.map((f) => f.name));
+  const toAdd = [];
+  if (!have.has("paymentId")) toAdd.push({ name: "paymentId", type: "text" });
+  if (!have.has("paidAt")) toAdd.push({ name: "paidAt", type: "date" });
+  if (toAdd.length === 0) {
+    console.log("= orders: поля paymentId/paidAt уже есть");
+  } else {
+    await pb.collections.update(orders.id, { fields: [...orders.fields, ...toAdd] });
+    console.log(`+ orders: добавлены поля ${toAdd.map((f) => f.name).join(", ")}`);
+  }
+}
 
 // content — редактируемые текстовые разделы сайта (отзывы, акция, FAQ).
 // По одной записи на раздел: key (уникальный) + data (JSON).

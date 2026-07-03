@@ -52,6 +52,34 @@ const card: React.CSSProperties = {
 
 const dateFmt = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric" });
 
+/** Цвета бейджа статуса заказа (фон/текст) по строке статуса. */
+function statusColors(status: string): { bg: string; fg: string } {
+  if (status === "Оплачен") return { bg: "var(--sage)", fg: "var(--green-3)" };
+  if (status === "Ожидает оплаты") return { bg: "#fff5e6", fg: "#b8730a" };
+  if (status === "Оплата не прошла") return { bg: "#fdecea", fg: "#c0392b" };
+  return { bg: "var(--sage-2)", fg: "var(--muted)" };
+}
+
+/** Пилюля-бейдж статуса заказа. */
+function StatusBadge({ status }: { status: string }) {
+  const c = statusColors(status);
+  return (
+    <span
+      style={{
+        fontSize: 12.5,
+        fontWeight: 700,
+        color: c.fg,
+        background: c.bg,
+        padding: "3px 10px",
+        borderRadius: 999,
+        whiteSpace: "nowrap",
+      }}
+    >
+      {status}
+    </span>
+  );
+}
+
 export default function AccountPage() {
   const { user, loading, logout, changePassword } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
@@ -214,7 +242,7 @@ export default function AccountPage() {
                   <span style={{ fontWeight: 700, fontSize: 14 }}>
                     {o.createdAt ? dateFmt.format(o.createdAt) : "—"}
                   </span>
-                  <span style={{ fontSize: 13, color: "var(--green-3)", fontWeight: 700 }}>{o.status}</span>
+                  <StatusBadge status={o.status} />
                 </div>
                 <div style={{ fontSize: 13.5, color: "var(--muted)", lineHeight: 1.6 }}>
                   {o.items.map((it, i) => (
