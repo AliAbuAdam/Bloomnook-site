@@ -56,7 +56,9 @@ node scripts/pb-setup.mjs
 ```
 # хук состоит из ДВУХ файлов (yookassa.pb.js + yookassa_lib.js) — копируйте оба:
 scp deploy/pb_hooks/*.js root@<IP>:/opt/pocketbase/pb_hooks/
-ssh root@<IP> 'chown pocketbase:pocketbase /opt/pocketbase/pb_hooks/*.js'
+# ВАЖНО: права на ВСЮ папку pb_hooks, иначе PocketBase не сможет прочитать хук
+# (open ... permission denied) и будет падать при старте, уронив весь сайт:
+ssh root@<IP> 'chown -R pocketbase:pocketbase /opt/pocketbase/pb_hooks && chmod 755 /opt/pocketbase/pb_hooks && chmod 644 /opt/pocketbase/pb_hooks/*.js'
 # впишите YOOKASSA_* в /opt/pocketbase/pb.env, затем:
 ssh root@<IP> 'systemctl restart pocketbase'
 ```

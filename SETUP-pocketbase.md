@@ -100,7 +100,9 @@ Redirect URI в кабинете Яндекса.
    файла-хука и подключают модуль через `require`). Копируйте оба:
    ```
    scp deploy/pb_hooks/*.js root@<IP>:/opt/pocketbase/pb_hooks/
-   ssh root@<IP> 'chown pocketbase:pocketbase /opt/pocketbase/pb_hooks/*.js'
+   # ВАЖНО: выдать права на ВСЮ папку pb_hooks. Иначе PocketBase не прочитает хук
+   # (panic: open ... permission denied) и будет крэшиться при старте, уронив сайт.
+   ssh root@<IP> 'chown -R pocketbase:pocketbase /opt/pocketbase/pb_hooks && chmod 755 /opt/pocketbase/pb_hooks && chmod 644 /opt/pocketbase/pb_hooks/*.js'
    ```
 2. **Задать секреты** в `/opt/pocketbase/pb.env` (файл-шаблон создаёт `install.sh`,
    права 600). Значения — из личного кабинета ЮKassa (Интеграция → Ключи API):
