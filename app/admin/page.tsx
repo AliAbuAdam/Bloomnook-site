@@ -5,10 +5,10 @@ import Motif from "@/components/Motif";
 import ContentManager from "@/components/ContentManager";
 import { pb, USERS, type BloomUser } from "@/lib/pb";
 import { money } from "@/lib/data";
+import { fetchCategories, DEFAULT_CATEGORIES } from "@/lib/content";
 import {
   AdminProduct,
   ProductInput,
-  CATEGORIES,
   MOTIFS,
   SEASONS,
   emptyProduct,
@@ -77,10 +77,20 @@ function NumField({
 /**
  * Редактор комплектов (фасовки): админ задаёт, сколько штук в наборе.
  * Числа вводятся через поле (можно сразу несколько: «3, 5, 10»), добавляются
- * по Enter или кнопкой. Поштучная продажа (1 шт) доступна всегда — её добавлять
- * не нужно. Кол-во комплектов не ограничено.
+ * по Enter или кнопкой. Поштучную продажу (1 шт) можно отключить галочкой —
+ * тогда товар продаётся только комплектами (нужен хотя бы один комплект).
  */
-function PacksField({ value, onChange }: { value: number[]; onChange: (next: number[]) => void }) {
+function PacksField({
+  value,
+  onChange,
+  packsOnly,
+  onPacksOnlyChange,
+}: {
+  value: number[];
+  onChange: (next: number[]) => void;
+  packsOnly: boolean;
+  onPacksOnlyChange: (next: boolean) => void;
+}) {
   const [text, setText] = useState("");
 
   function commit() {
@@ -96,7 +106,10 @@ function PacksField({ value, onChange }: { value: number[]; onChange: (next: num
   }
 
   function remove(n: number) {
-    onChange(value.filter((v) => v !== n));
+    const next = value.filter((v) => v !== n);
+    onChange(next);
+    // Убрали последний комплект — «только комплектами» больше невозможно.
+    if (next.length === 0 && packsOnly) onPacksOnlyChange(false);
   }
 
   const chip: React.CSSProperties = {
@@ -114,9 +127,11 @@ function PacksField({ value, onChange }: { value: number[]; onChange: (next: num
   return (
     <div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: value.length ? 10 : 0 }}>
-        <span style={{ ...chip, background: "var(--sage)", borderColor: "#cfe0c6", color: "var(--green)", paddingRight: 14 }}>
-          1 шт · поштучно
-        </span>
+        {!packsOnly && (
+          <span style={{ ...chip, background: "var(--sage)", borderColor: "#cfe0c6", color: "var(--green)", paddingRight: 14 }}>
+            1 шт · поштучно
+          </span>
+        )}
         {value.map((n) => (
           <span key={n} style={chip}>
             {n} шт
@@ -160,6 +175,29 @@ function PacksField({ value, onChange }: { value: number[]; onChange: (next: num
           Добавить
         </button>
       </div>
+      <label
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 8,
+          marginTop: 12,
+          fontSize: 13.5,
+          fontWeight: 600,
+          cursor: value.length ? "pointer" : "default",
+          opacity: value.length ? 1 : 0.55,
+        }}
+        title={value.length ? "" : "Сначала добавьте хотя бы один комплект"}
+      >
+        <input
+          type="checkbox"
+          checked={!packsOnly}
+          disabled={!value.length}
+          onChange={(e) => onPacksOnlyChange(!e.target.checked)}
+          style={{ width: 16, height: 16, accentColor: "var(--accent)" }}
+        />
+        Продавать поштучно (1 шт)
+        {!value.length && <span style={{ fontWeight: 400, color: "var(--muted)" }}>— нельзя отключить без комплектов</span>}
+      </label>
     </div>
   );
 }
@@ -200,6 +238,10 @@ export default function AdminPage() {
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [loading, setLoading] = useState(false);
   const [dataError, setDataError] = useState("");
+
+  // Список категорий для селекта в форме товара — редактируется во вкладке
+  // «Разделы сайта» (раздел «Категории товаров», коллекция `content`).
+  const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES);
 
   const [form, setForm] = useState<ProductInput | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -249,6 +291,13 @@ export default function AdminPage() {
     if (authed) load();
   }, [authed, load]);
 
+  // Категории обновляем и при возврате с вкладки «Разделы сайта» — чтобы
+  // только что добавленная категория сразу появилась в форме товара.
+  useEffect(() => {
+    if (!authed) return;
+    fetchCategories().then(setCategories).catch(() => {});
+  }, [authed, tab]);
+
   // Скидка считается автоматически из старой и новой цены.
   useEffect(() => {
     if (!form) return;
@@ -280,7 +329,8 @@ export default function AdminPage() {
 
   function openNew() {
     const nextOrder = products.length ? Math.max(...products.map((p) => p.order)) + 1 : 0;
-    setForm(emptyProduct(nextOrder));
+    // Категория по умолчанию — первая из настраиваемого списка.
+    setForm({ ...emptyProduct(nextOrder), cat: categories[0] ?? "" });
     setEditingId(null);
     setOriginalImages([]);
   }
@@ -647,7 +697,9 @@ export default function AdminPage() {
             <div>
               <label style={label}>Категория</label>
               <select style={input} value={form.cat} onChange={(e) => setField("cat", e.target.value)}>
-                {CATEGORIES.map((c) => (
+                {/* Категория редактируемого товара могла быть удалена из списка —
+                    показываем её первой, чтобы select не подменял значение молча. */}
+                {(form.cat && !categories.includes(form.cat) ? [form.cat, ...categories] : categories).map((c) => (
                   <option key={c} value={c}>
                     {c}
                   </option>
@@ -719,10 +771,16 @@ export default function AdminPage() {
               <label style={label}>
                 Комплекты{" "}
                 <span style={{ fontWeight: 400, color: "var(--muted)" }}>
-                  — сколько штук в наборе. Цена комплекта = цена за шт × количество. Поштучно — всегда.
+                  — сколько штук в наборе. Цена комплекта = цена за шт × количество. Поштучную продажу можно
+                  отключить галочкой ниже — тогда товар продаётся только комплектами.
                 </span>
               </label>
-              <PacksField value={form.packs} onChange={(next) => setField("packs", next)} />
+              <PacksField
+                value={form.packs}
+                onChange={(next) => setField("packs", next)}
+                packsOnly={form.packsOnly}
+                onPacksOnlyChange={(next) => setField("packsOnly", next)}
+              />
             </div>
             <div style={{ gridColumn: "span 3", height: 1, background: "var(--line)", margin: "4px 0" }} />
             <div>

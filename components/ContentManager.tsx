@@ -5,6 +5,8 @@ import {
   fetchPromo,
   fetchReviews,
   fetchFaq,
+  fetchCategories,
+  normalizeCategories,
   saveContent,
   initialsFromName,
   CONTENT_KEYS,
@@ -354,9 +356,65 @@ function FaqEditor() {
   );
 }
 
+function CategoriesEditor() {
+  const [items, setItems] = useState<string[]>([]);
+  const { saving, status, save } = useSaver(CONTENT_KEYS.categories);
+
+  useEffect(() => {
+    fetchCategories().then(setItems).catch(() => {});
+  }, []);
+
+  function setItem(idx: number, value: string) {
+    setItems((list) => list.map((it, i) => (i === idx ? value : it)));
+  }
+
+  function add() {
+    setItems((list) => [...list, ""]);
+  }
+
+  function remove(idx: number) {
+    setItems((list) => list.filter((_, i) => i !== idx));
+  }
+
+  return (
+    <section style={sectionCard}>
+      <SectionHead
+        title="Категории товаров"
+        hint="Список, из которого выбирается категория при создании и редактировании товара. На витрине категория появляется сама, как только в ней есть товары в наличии. Переименование или удаление категории из списка не меняет уже созданные товары."
+        status={status}
+        saving={saving}
+        onSave={() => save(normalizeCategories(items))}
+      />
+      {items.map((it, i) => (
+        <div key={i} style={{ ...itemCard, display: "flex", alignItems: "center", gap: 10, padding: "10px 12px" }}>
+          <input
+            style={{ ...input, flex: 1 }}
+            value={it}
+            onChange={(e) => setItem(i, e.target.value)}
+            placeholder="Например: Крокус"
+          />
+          <button type="button" style={smallBtn} onClick={() => setItems((l) => move(l, i, -1))} disabled={i === 0} title="Выше">
+            ↑
+          </button>
+          <button type="button" style={smallBtn} onClick={() => setItems((l) => move(l, i, 1))} disabled={i === items.length - 1} title="Ниже">
+            ↓
+          </button>
+          <button type="button" style={{ ...smallBtn, color: "#c0392b", borderColor: "#e6c3bb" }} onClick={() => remove(i)}>
+            Удалить
+          </button>
+        </div>
+      ))}
+      <button type="button" style={ghostBtn} onClick={add}>
+        + Добавить категорию
+      </button>
+    </section>
+  );
+}
+
 /**
- * Редактор текстовых разделов сайта (Linear CEO-39): акция посадки, отзывы, FAQ.
- * Каждый раздел сохраняется отдельной кнопкой в коллекцию PocketBase `content`.
+ * Редактор текстовых разделов сайта (Linear CEO-39): акция посадки, отзывы, FAQ,
+ * категории товаров. Каждый раздел сохраняется отдельной кнопкой в коллекцию
+ * PocketBase `content`.
  */
 export default function ContentManager() {
   return (
@@ -364,6 +422,7 @@ export default function ContentManager() {
       <p style={{ fontSize: 14, color: "var(--muted)", margin: "0 0 24px" }}>
         Тексты сохраняются в базе и сразу отражаются на главной странице. Каждый раздел сохраняется отдельно.
       </p>
+      <CategoriesEditor />
       <PromoEditor />
       <ReviewsEditor />
       <FaqEditor />

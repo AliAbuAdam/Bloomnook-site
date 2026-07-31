@@ -123,9 +123,27 @@ await ensure("products", {
     { name: "usage", type: "text" },
     { name: "care", type: "text" },
     { name: "packs", type: "json", maxSize: 200000 },
+    { name: "packsOnly", type: "bool" },
     { name: "order", type: "number" },
   ],
 });
+
+// Поля каталога, добавленные после первичной настройки (ensure существующую
+// коллекцию не трогает). Идемпотентно: добавляем только отсутствующие.
+// packsOnly: true — товар продаётся только комплектами, без поштучной продажи.
+// У старых записей поле получит false — поштучная продажа сохраняется.
+{
+  const products = await pb.collections.getOne("products");
+  const have = new Set(products.fields.map((f) => f.name));
+  const toAdd = [];
+  if (!have.has("packsOnly")) toAdd.push({ name: "packsOnly", type: "bool" });
+  if (toAdd.length === 0) {
+    console.log("= products: доп. поля уже есть");
+  } else {
+    await pb.collections.update(products.id, { fields: [...products.fields, ...toAdd] });
+    console.log(`+ products: добавлены поля ${toAdd.map((f) => f.name).join(", ")}`);
+  }
+}
 
 // orders — заказы. Пользователь видит/создаёт только свои; правка — суперюзер.
 await ensure("orders", {

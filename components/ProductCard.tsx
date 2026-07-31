@@ -19,12 +19,13 @@ export default function ProductCard({
   const { add } = useCart();
   const [added, setAdded] = useState(false);
 
-  // Быстрое добавление с карточки — поштучно, 1 шт. Карточка обёрнута в ссылку,
+  // Быстрое добавление с карточки: поштучно (1 шт), а если товар продаётся
+  // только комплектами — минимальный комплект. Карточка обёрнута в ссылку,
   // поэтому гасим переход и всплытие клика.
   function handleAdd(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    add(item, 1, 1);
+    add(item, item.packsOnly ? (item.packs[0] ?? 1) : 1, 1);
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1600);
   }
@@ -130,7 +131,8 @@ export default function ProductCard({
         </div>
         {item.packs.length > 0 && (
           <span style={{ fontSize: 12, color: "var(--green-3)", fontWeight: 600 }}>
-            Комплекты: {item.packs.join(" · ")} шт
+            {item.packsOnly ? "Только комплектами: " : "Комплекты: "}
+            {item.packs.join(" · ")} шт
           </span>
         )}
         {showButton && (

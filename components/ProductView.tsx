@@ -127,10 +127,10 @@ export default function ProductView() {
   const mainPhoto = hasPhotos ? p.images[Math.min(gallery, p.images.length - 1)] : null;
   const specRows = specs(p);
 
-  // Фасовка: поштучно (1) всегда первой, далее комплекты из карточки.
-  const packOptions = [1, ...p.packs];
+  // Фасовка: комплекты из карточки; поштучно (1) — первой, если не отключено.
+  const packOptions = p.packsOnly ? p.packs : [1, ...p.packs];
   // Защита от устаревшего выбора после смены товара.
-  const activePack = packOptions.includes(pack) ? pack : 1;
+  const activePack = packOptions.includes(pack) ? pack : (packOptions[0] ?? 1);
   const hasPrice = p.priceValue > 0;
   // Цена линейна: комплект из N шт = цена за шт × N. Поэтому N шт поштучно
   // и один комплект из N шт стоят одинаково.
@@ -302,7 +302,9 @@ export default function ProductView() {
             </div>
           )}
 
-          {packOptions.length > 1 && (
+          {/* Селектор показываем и при единственном комплекте (packsOnly) —
+              чтобы покупатель явно видел, что товар продаётся набором. */}
+          {(packOptions.length > 1 || p.packsOnly) && (
             <div style={{ marginBottom: 18 }}>
               <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>Фасовка</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>

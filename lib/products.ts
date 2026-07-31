@@ -25,6 +25,7 @@ export interface ProductInput {
   usage: string; // применение
   care: string; // условия выращивания и уход
   packs: number[]; // комплекты (шт в наборе), напр. [3, 5, 10]; [] — только поштучно
+  packsOnly: boolean; // true — только комплектами (поштучная продажа отключена); требует непустой packs
   order: number;
 }
 
@@ -74,6 +75,7 @@ const TILE_TINTS = ["#EEF3EA", "#F5F2E8"];
 
 /** Map a stored product to the display shape used by the storefront cards. */
 export function toDisplayProduct(p: AdminProduct, index: number): Product {
+  const packs = normalizePacks(p.packs);
   return {
     id: p.id,
     name: p.name,
@@ -104,7 +106,10 @@ export function toDisplayProduct(p: AdminProduct, index: number): Product {
     color: p.color,
     usage: p.usage,
     care: p.care,
-    packs: normalizePacks(p.packs),
+    packs,
+    // «Только комплектами» без единого комплекта — некорректное состояние:
+    // такой товар было бы нельзя купить, поэтому включаем поштучную продажу.
+    packsOnly: p.packsOnly && packs.length > 0,
     tile: TILE_TINTS[index % 2],
   };
 }
@@ -134,6 +139,7 @@ export function emptyProduct(order: number): ProductInput {
     usage: "",
     care: "",
     packs: [],
+    packsOnly: false,
     order,
   };
 }
@@ -162,6 +168,8 @@ function inputFromDoc(data: Record<string, unknown>): ProductInput {
     usage: String(data.usage ?? ""),
     care: String(data.care ?? ""),
     packs: normalizePacks(data.packs),
+    // У старых записей поля нет (undefined/false) — поштучная продажа доступна.
+    packsOnly: data.packsOnly === true,
     order: Number(data.order ?? 0),
   };
 }
@@ -190,7 +198,9 @@ export async function fetchDisplayProducts(): Promise<Product[]> {
  */
 function withNormalizedImages(input: ProductInput): ProductInput {
   const images = normalizeImages(input.images, input.image);
-  return { ...input, images, image: images[0] ?? "", packs: normalizePacks(input.packs) };
+  const packs = normalizePacks(input.packs);
+  // «Только комплектами» не может жить без комплектов — сбрасываем на поштучно.
+  return { ...input, images, image: images[0] ?? "", packs, packsOnly: input.packsOnly && packs.length > 0 };
 }
 
 export async function addProduct(input: ProductInput): Promise<void> {

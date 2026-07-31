@@ -1,5 +1,6 @@
 import { pb } from "./pb";
 import { testimonials as defaultTestimonials, faqs as defaultFaqs, type Testimonial, type Faq } from "./data";
+import { CATEGORIES } from "./products";
 
 /**
  * Редактируемые из админки текстовые разделы сайта (Linear CEO-39): отзывы,
@@ -18,6 +19,7 @@ export const CONTENT_KEYS = {
   promo: "promo",
   reviews: "reviews",
   faq: "faq",
+  categories: "categories",
 } as const;
 
 /** Текстовое наполнение блока «Акция посадки» (компонент SeasonalPromo). */
@@ -107,6 +109,33 @@ export async function fetchReviews(): Promise<ReviewItem[]> {
 export async function fetchFaq(): Promise<Faq[]> {
   const data = await fetchContent<Faq[]>(CONTENT_KEYS.faq, DEFAULT_FAQ);
   return Array.isArray(data) && data.length ? data : DEFAULT_FAQ;
+}
+
+/** Дефолтный список категорий товара — пока раздел не отредактирован в админке. */
+export const DEFAULT_CATEGORIES: string[] = [...CATEGORIES];
+
+/** Очистить список категорий: строки без пробелов по краям, без пустых и дублей. */
+export function normalizeCategories(raw: unknown): string[] {
+  const arr = Array.isArray(raw) ? raw : [];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const v of arr) {
+    const name = String(v ?? "").trim();
+    if (!name || seen.has(name)) continue;
+    seen.add(name);
+    out.push(name);
+  }
+  return out;
+}
+
+/**
+ * Список категорий товара для формы в админке. Если раздел не создан или
+ * оказался пустым — возвращаются дефолтные категории.
+ */
+export async function fetchCategories(): Promise<string[]> {
+  const data = await fetchContent<string[]>(CONTENT_KEYS.categories, DEFAULT_CATEGORIES);
+  const list = normalizeCategories(data);
+  return list.length ? list : DEFAULT_CATEGORIES;
 }
 
 /**

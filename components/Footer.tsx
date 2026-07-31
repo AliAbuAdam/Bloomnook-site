@@ -26,7 +26,7 @@ export default function Footer() {
       <div className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "64px 32px 28px" }}>
         <div className="bn-footer-grid" style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr 1fr 1.2fr", gap: 40 }}>
           <div>
-            <Image src={footerLogo} alt="Bloom Nook" width={116} height={44} style={{ height: 44, width: "auto", marginBottom: 18 }} />
+            <Image src={footerLogo} alt="Bloom Nook" width={80} height={44} style={{ height: 44, width: "auto", marginBottom: 18 }} />
             <p style={{ fontSize: 14, lineHeight: 1.7, opacity: 0.8, margin: "0 0 22px", maxWidth: 300 }}>
               Отборные луковицы цветов с доставкой по всей России через Ozon. Сажайте сейчас — цветите весной.
             </p>
@@ -104,6 +104,9 @@ export default function Footer() {
           <span style={{ display: "flex", gap: 22 }}>
             <Link href="/privacy" className="bn-foot-link" style={colLink}>
               Политика конфиденциальности
+            </Link>
+            <Link href="/returns" className="bn-foot-link" style={colLink}>
+              Условия возврата
             </Link>
             <a href="#" className="bn-foot-link" style={colLink}>
               Оферта
