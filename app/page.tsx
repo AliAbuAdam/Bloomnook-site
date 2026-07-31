@@ -63,11 +63,11 @@ export default function Home() {
             <h1 className="bn-h" style={{ fontSize: "clamp(36px, 8vw, 62px)", lineHeight: 1.04, fontWeight: 300, margin: "22px 0 0", color: "var(--ink)", textTransform: "uppercase" }}>
               Сад начинается
               <br />
-              <span style={{ fontWeight: 600 }}>с хорошей <span style={{ color: "var(--accent)" }}>луковицы</span></span>
+              <span style={{ fontWeight: 600 }}>с отборной <span style={{ color: "var(--accent)" }}>луковицы</span></span>
             </h1>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: "var(--muted)", maxWidth: 480, margin: "22px 0 0" }}>
-              Отборный посадочный материал тюльпанов, нарциссов, гиацинтов и лилий. Заказ и доставка — через Ozon, удобно и
-              безопасно.
+              Голландский посадочный материал с гарантией качества и всхожести. Ручная сортировка перед отправкой и
+              бережная доставка через Ozon по всей России.
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 34 }}>
               <Link
