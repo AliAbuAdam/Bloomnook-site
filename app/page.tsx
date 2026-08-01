@@ -5,8 +5,8 @@ import LiveProductGrid from "@/components/LiveProductGrid";
 import LiveCategoryGrid from "@/components/LiveCategoryGrid";
 import SeasonalPromo from "@/components/SeasonalPromo";
 import Faq from "@/components/Faq";
-import LiveTestimonials from "@/components/LiveTestimonials";
-import { ArrowRight, Leaf, Star, Stars, Truck, Shield, Refresh } from "@/components/icons";
+import PhotoReviews from "@/components/PhotoReviews";
+import { ArrowRight, Leaf, Star, Stars, Truck, Shield, Refresh, Telegram } from "@/components/icons";
 import { steps, benefits, CONTACT } from "@/lib/data";
 
 const eyebrow: React.CSSProperties = {
@@ -336,7 +336,7 @@ export default function Home() {
             Что говорят <span style={{ color: "var(--accent)", fontStyle: "italic" }}>садоводы</span>
           </h2>
         </div>
-        <LiveTestimonials />
+        <PhotoReviews />
       </section>
 
       {/* FAQ */}
@@ -402,6 +402,62 @@ export default function Home() {
               Написать нам
             </a>
           </div>
+        </div>
+      </section>
+
+      {/* WHOLESALE — блок для оптовых покупателей */}
+      <section id="opt" className="bn-pad" style={{ maxWidth: 1240, margin: "0 auto", padding: "88px 32px 0" }}>
+        <div
+          className="bn-stack"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1.15fr 1fr",
+            borderRadius: 28,
+            overflow: "hidden",
+            background: "var(--green)",
+            color: "#fff",
+          }}
+        >
+          <div style={{ padding: "clamp(28px, 5vw, 56px)", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start" }}>
+            <span style={{ ...eyebrow, color: "#b8d3ad" }}>Оптовикам</span>
+            <h2 className="bn-h" style={{ fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 600, margin: "12px 0 14px", lineHeight: 1.15 }}>
+              Луковицы оптом — <span style={{ fontStyle: "italic", color: "#cfe6c2" }}>для бизнеса</span>
+            </h2>
+            <p style={{ fontSize: 16, lineHeight: 1.65, opacity: 0.88, margin: "0 0 28px", maxWidth: 460 }}>
+              Отгружаем любые объёмы по специальным оптовым ценам. Напишите нам в Telegram — вышлем
+              актуальный прайс, наличие и условия доставки.
+            </p>
+            <a
+              href={CONTACT.telegram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bn-hover-fade"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 10,
+                background: "#fff",
+                color: "var(--green)",
+                fontWeight: 700,
+                fontSize: 15.5,
+                padding: "15px 26px",
+                minWidth: "min(300px, 100%)",
+                borderRadius: 999,
+                textDecoration: "none",
+              }}
+            >
+              <Telegram size={17} />
+              Запросить цены
+            </a>
+          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/wholesale.jpg"
+            alt="Рассада в горшках и садовая лопатка — оптовые поставки посадочного материала"
+            loading="lazy"
+            style={{ width: "100%", height: "100%", minHeight: 300, maxHeight: 480, objectFit: "cover", display: "block" }}
+          />
         </div>
       </section>
 

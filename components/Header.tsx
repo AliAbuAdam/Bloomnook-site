@@ -22,6 +22,7 @@ const navItems = [
   { label: "Магазин", href: "/shop" },
   { label: "Категории", href: "/#cats" },
   { label: "Посадка", href: "/#steps" },
+  { label: "Оптовикам", href: "/#opt" },
   { label: "Отзывы", href: "/#reviews" },
   { label: "FAQ", href: "/#faq" },
   { label: "Контакты", href: "/contacts" },

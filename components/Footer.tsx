@@ -74,6 +74,9 @@ export default function Footer() {
               <Link href="/#faq" className="bn-foot-link" style={colLink}>
                 Вопросы и ответы
               </Link>
+              <Link href="/#opt" className="bn-foot-link" style={colLink}>
+                Оптовикам
+              </Link>
             </div>
           </div>
           <div>
