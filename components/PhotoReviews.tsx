@@ -9,6 +9,7 @@ interface PhotoReview {
   shot: string; // скриншот отзыва
   photo: string; // фото цветов покупателя
   alt: string;
+  photoAlt: string; // alt фото цветов — индексируется поиском по картинкам
 }
 
 const REVIEWS: PhotoReview[] = [
@@ -16,16 +17,19 @@ const REVIEWS: PhotoReview[] = [
     shot: "/reviews/review-1.png",
     photo: "/reviews/flowers-1.jpg",
     alt: "Отзыв Елены о нарциссах: посадила осенью, всё взошло — с фото букета жёлтых нарциссов",
+    photoAlt: "Букет жёлтых нарциссов, выращенных из луковиц Bloom Nook — фото покупателя",
   },
   {
     shot: "/reviews/review-2.png",
     photo: "/reviews/flowers-2.jpg",
     alt: "Отзыв Марины о белых лилиях: высоченные, цветы огромные — с фото белых лилий в палисаднике",
+    photoAlt: "Белые лилии в палисаднике, выращенные из луковиц Bloom Nook — фото покупателя",
   },
   {
     shot: "/reviews/review-3.png",
     photo: "/reviews/flowers-3.jpg",
     alt: "Отзыв Марии о тюльпанах: отличные луковицы, выросли красивые тюльпаны — с фото сиреневых тюльпанов",
+    photoAlt: "Сиреневые тюльпаны на клумбе, выращенные из луковиц Bloom Nook — фото покупателя",
   },
 ];
 
@@ -85,8 +89,7 @@ export default function PhotoReviews() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={r.photo}
-            alt=""
-            aria-hidden="true"
+            alt={r.photoAlt}
             loading="lazy"
             style={{
               position: "absolute",

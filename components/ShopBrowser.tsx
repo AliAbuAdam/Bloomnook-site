@@ -79,11 +79,15 @@ function toggle<T>(set: Set<T>, value: T): Set<T> {
   return next;
 }
 
-export default function ShopBrowser({ fallback }: { fallback: Product[] }) {
+/**
+ * Каталог с фильтрами. `initialCat` — предвыбранная категория (страницы
+ * /shop/<категория>/): попадает и в статический HTML при сборке, и в фильтр.
+ */
+export default function ShopBrowser({ fallback, initialCat }: { fallback: Product[]; initialCat?: string }) {
   const [items, setItems] = useState<Product[]>(fallback);
 
   // filter state
-  const [cats, setCats] = useState<Set<string>>(new Set());
+  const [cats, setCats] = useState<Set<string>>(new Set(initialCat ? [initialCat] : []));
   const [seasons, setSeasons] = useState<Set<Season>>(new Set());
   const [months, setMonths] = useState<Set<string>>(new Set());
   const [heights, setHeights] = useState<Set<HeightBucket>>(new Set());
@@ -104,10 +108,12 @@ export default function ShopBrowser({ fallback }: { fallback: Product[] }) {
 
   // Предвыбор категории из URL (?cat=…) — например, при переходе с карточки
   // категории на главной. Делается после монтирования, чтобы не ломать гидрацию.
+  // На страницах категорий (initialCat) query игнорируем — категория уже выбрана.
   useEffect(() => {
+    if (initialCat) return;
     const cat = new URLSearchParams(window.location.search).get("cat");
     if (cat) setCats(new Set([cat]));
-  }, []);
+  }, [initialCat]);
 
   useEffect(() => {
     let alive = true;

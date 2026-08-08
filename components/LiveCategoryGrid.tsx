@@ -5,6 +5,7 @@ import Link from "next/link";
 import Motif from "./Motif";
 import { fetchDisplayProducts } from "@/lib/products";
 import { sortsLabel, type Motif as MotifKind } from "@/lib/data";
+import { categorySlug } from "@/lib/slug";
 
 /** Карточка категории в том виде, в каком её рисует витрина. */
 interface CategoryCard {
@@ -72,7 +73,7 @@ export default function LiveCategoryGrid() {
   return (
     <div className="bn-g-cats" style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 18 }}>
       {cards.map((cat) => (
-        <Link key={cat.name} href={`/shop?cat=${encodeURIComponent(cat.name)}`} className="bn-cat" style={card}>
+        <Link key={cat.name} href={`/shop/${categorySlug(cat.name)}/`} className="bn-cat" style={card}>
           <div style={{ height: 78, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
             <Motif href={cat.useHref} strokeWidth={3} style={{ width: "auto", height: 78 }} />
           </div>

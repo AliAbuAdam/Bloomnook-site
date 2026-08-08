@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import CookieBanner from "@/components/CookieBanner";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { SITE_URL, SITE_NAME, organizationJsonLd, jsonLdScript } from "@/lib/seo";
 
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
@@ -17,9 +18,24 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Bloom Nook — луковицы цветов с доставкой через Ozon",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Bloom Nook — купить луковицы цветов с доставкой по России",
+    template: `%s — ${SITE_NAME}`,
+  },
   description:
-    "Отборный посадочный материал тюльпанов, нарциссов, гиацинтов и лилий. Заказ и доставка — через Ozon, удобно и безопасно.",
+    "Интернет-магазин луковиц цветов: тюльпаны, лилии, нарциссы и редкие сорта. Отборный калиброванный посадочный материал, бесплатная доставка по всей России, памятка по посадке в каждом заказе.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    locale: "ru_RU",
+    url: "/",
+    title: "Bloom Nook — купить луковицы цветов с доставкой по России",
+    description:
+      "Отборные луковицы тюльпанов, лилий, нарциссов и редких сортов с бесплатной доставкой по всей России.",
+    images: [{ url: "/hero-garden.jpg" }],
+  },
 };
 
 export const viewport: Viewport = {
@@ -31,6 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ru" className={inter.variable}>
       <body>
+        <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScript(organizationJsonLd())} />
         <MotifSprite />
         <AuthProvider>
           <CartProvider>

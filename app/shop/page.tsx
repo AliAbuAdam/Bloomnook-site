@@ -1,7 +1,26 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import ShopBrowser from "@/components/ShopBrowser";
+import { buildDisplayProducts } from "@/lib/catalog-build";
 
-export default function ShopPage() {
+export const metadata: Metadata = {
+  title: "Каталог луковиц цветов — купить с доставкой по России",
+  description:
+    "Каталог Bloom Nook: луковицы тюльпанов, лилий, нарциссов и редких сортов. Фильтры по сроку посадки, цветению и высоте. Бесплатная доставка по всей России.",
+  alternates: { canonical: "/shop/" },
+  openGraph: {
+    type: "website",
+    url: "/shop/",
+    title: "Каталог луковиц цветов — купить с доставкой по России",
+    description:
+      "Луковицы тюльпанов, лилий, нарциссов и редких сортов с бесплатной доставкой по всей России.",
+  },
+};
+
+export default async function ShopPage() {
+  // Товары со сборки — попадают в статический HTML (индексация), после
+  // загрузки страница сама обновит список из PocketBase.
+  const products = await buildDisplayProducts();
   return (
     <main>
       <div style={{ background: "var(--sage-2)", borderBottom: "1px solid var(--line)" }}>
@@ -18,7 +37,7 @@ export default function ShopPage() {
         </div>
       </div>
 
-      <ShopBrowser fallback={[]} />
+      <ShopBrowser fallback={products} />
     </main>
   );
 }

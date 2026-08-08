@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import Motif from "./Motif";
 import { Star, Heart, Truck, Minus, Plus, Check, Cart } from "./icons";
 import { fetchDisplayProductById } from "@/lib/products";
@@ -27,13 +26,36 @@ function specs(p: Product): { label: string; value: string }[] {
   ].filter((s) => s.value);
 }
 
-export default function ProductView() {
-  const params = useSearchParams();
-  const id = params.get("id");
+/**
+ * Страница товара. Работает в двух режимах:
+ * - статическая SEO-страница /product/<slug>/ — товар передаётся пропсами
+ *   (`id` + `initial`), контент попадает в HTML при сборке, а после загрузки
+ *   тихо обновляется из PocketBase (свежие цена и наличие);
+ * - легаси-адрес /product?id=… — id читается из query, товар грузится на клиенте.
+ *
+ * Query читаем через window.location, а не useSearchParams: хук при статической
+ * сборке вырезал бы контент товара из прегенерированного HTML (до ближайшей
+ * границы Suspense), и поисковики видели бы пустую страницу.
+ */
+export default function ProductView({
+  id: idProp,
+  initial = null,
+}: {
+  id?: string;
+  initial?: Product | null;
+} = {}) {
+  // undefined — query ещё не прочитан (легаси-режим до монтирования), "" — id нет.
+  const [legacyId, setLegacyId] = useState<string | undefined>(undefined);
+  const id = idProp ?? legacyId;
   const { add } = useCart();
 
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    if (idProp) return; // статический режим — id известен со сборки
+    setLegacyId(new URLSearchParams(window.location.search).get("id") ?? "");
+  }, [idProp]);
+
+  const [product, setProduct] = useState<Product | null>(initial);
+  const [loading, setLoading] = useState(!initial);
   const [gallery, setGallery] = useState(0);
   const [qty, setQty] = useState(1);
   // Выбранная фасовка — число штук в одном комплекте. 1 — поштучно.
@@ -43,8 +65,8 @@ export default function ProductView() {
   const [added, setAdded] = useState(false);
 
   useEffect(() => {
+    if (id === undefined) return; // легаси-режим: ждём чтения query после монтирования
     let alive = true;
-    setLoading(true);
     setGallery(0);
     setQty(1);
     setPack(1);
@@ -53,12 +75,15 @@ export default function ProductView() {
       setLoading(false);
       return;
     }
+    // Со статической страницы товар уже есть — обновляем фоном, без «Загрузка…».
+    if (!initial) setLoading(true);
     fetchDisplayProductById(id)
       .then((p) => {
-        if (alive) setProduct(p);
+        // При недоступной базе оставляем предзагруженные данные со сборки.
+        if (alive && (p || !initial)) setProduct(p ?? initial);
       })
       .catch(() => {
-        if (alive) setProduct(null);
+        if (alive && !initial) setProduct(null);
       })
       .finally(() => {
         if (alive) setLoading(false);
@@ -66,6 +91,7 @@ export default function ProductView() {
     return () => {
       alive = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const crumb = (name: string) => (
@@ -211,7 +237,7 @@ export default function ProductView() {
                   }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <img src={url} alt={`${p.name} — фото ${i + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </div>
               ))}
             </div>

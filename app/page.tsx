@@ -1,6 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
-import heroTulip from "@/public/hero-tulip.jpg";
+import HeroSlider from "@/components/HeroSlider";
 import LiveProductGrid from "@/components/LiveProductGrid";
 import LiveCategoryGrid from "@/components/LiveCategoryGrid";
 import SeasonalPromo from "@/components/SeasonalPromo";
@@ -8,6 +7,9 @@ import Faq from "@/components/Faq";
 import PhotoReviews from "@/components/PhotoReviews";
 import { ArrowRight, Leaf, Star, Stars, Truck, Shield, Refresh, Telegram } from "@/components/icons";
 import { steps, benefits, CONTACT } from "@/lib/data";
+import { buildDisplayProducts } from "@/lib/catalog-build";
+import { fetchFaq } from "@/lib/content";
+import { faqJsonLd, jsonLdScript } from "@/lib/seo";
 
 const eyebrow: React.CSSProperties = {
   fontSize: 13,
@@ -23,9 +25,16 @@ function benefitIcon(icon: string) {
   return <Leaf />;
 }
 
-export default function Home() {
+export default async function Home() {
+  // Товары со сборки — «Хиты сезона» попадают в статический HTML для индексации.
+  const products = await buildDisplayProducts();
+  // FAQ для разметки FAQPage — актуальная редакция из админки (или дефолтная).
+  const faqList = await fetchFaq().catch(() => []);
   return (
     <main>
+      {faqList.length > 0 && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScript(faqJsonLd(faqList))} />
+      )}
       {/* HERO */}
       <section style={{ background: "linear-gradient(180deg,var(--sage-2),#fff)" }}>
         <div
@@ -135,14 +144,7 @@ export default function Home() {
                 position: "relative",
               }}
             >
-              <Image
-                src={heroTulip}
-                alt="Белый махровый тюльпан"
-                fill
-                sizes="(max-width: 900px) 340px, 50vw"
-                style={{ objectFit: "cover" }}
-                priority
-              />
+              <HeroSlider />
             </div>
             <div
               className="bn-hero-badge-l"
@@ -258,7 +260,7 @@ export default function Home() {
             Смотреть все <ArrowRight size={16} strokeWidth={1.9} />
           </Link>
         </div>
-        <LiveProductGrid fallback={[]} limit={4} columns={4} showHeart showButton />
+        <LiveProductGrid fallback={products} limit={4} columns={4} showHeart showButton />
       </section>
 
       {/* SEASONAL PROMO */}

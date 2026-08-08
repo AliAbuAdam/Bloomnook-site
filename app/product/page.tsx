@@ -1,6 +1,18 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import ProductView from "@/components/ProductView";
 import LiveProductGrid from "@/components/LiveProductGrid";
+
+/**
+ * Легаси-адрес товара /product?id=… — работает для старых ссылок и для товаров,
+ * добавленных после последней сборки (см. app/not-found.tsx). Основные адреса
+ * теперь /product/<slug>/, поэтому эту версию прячем от поисковиков (noindex),
+ * чтобы не создавать дубли контента.
+ */
+export const metadata: Metadata = {
+  title: "Товар",
+  robots: { index: false, follow: true },
+};
 
 export default function ProductPage() {
   return (

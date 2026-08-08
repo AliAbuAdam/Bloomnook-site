@@ -5,6 +5,7 @@ import Link from "next/link";
 import Motif from "./Motif";
 import { Star, Heart, Check } from "./icons";
 import type { Product } from "@/lib/data";
+import { productSlug } from "@/lib/slug";
 import { useCart } from "@/contexts/CartContext";
 
 export default function ProductCard({
@@ -32,7 +33,7 @@ export default function ProductCard({
 
   return (
     <Link
-      href={`/product?id=${item.id}`}
+      href={`/product/${productSlug(item)}/`}
       className="bn-prod"
       style={{
         cursor: "pointer",
