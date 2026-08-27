@@ -12,17 +12,33 @@ import type { Product } from "./data";
  * генерируются. На CI переменная NEXT_PUBLIC_PB_URL указывает на прод.
  */
 let cached: Promise<AdminProduct[]> | null = null;
+let unavailable = false;
+
+/** true — база не ответила при сборке (после всех повторов). */
+export function catalogUnavailable(): boolean {
+  return unavailable;
+}
+
+async function fetchWithRetries(): Promise<AdminProduct[]> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      return await fetchProducts();
+    } catch (e) {
+      lastError = e;
+      if (attempt < 3) await new Promise((r) => setTimeout(r, 5000));
+    }
+  }
+  unavailable = true;
+  console.warn(
+    `[seo] PocketBase недоступен (${process.env.NEXT_PUBLIC_PB_URL || "localhost"}), 3 попытки: ` +
+      `${(lastError as Error)?.message ?? lastError}`,
+  );
+  return [];
+}
 
 export function buildProducts(): Promise<AdminProduct[]> {
-  if (!cached) {
-    cached = fetchProducts().catch((e) => {
-      console.warn(
-        `[seo] PocketBase недоступен (${process.env.NEXT_PUBLIC_PB_URL || "localhost"}): ` +
-          `страницы товаров не будут сгенерированы. ${e?.message ?? e}`,
-      );
-      return [];
-    });
-  }
+  if (!cached) cached = fetchWithRetries();
   return cached;
 }
 

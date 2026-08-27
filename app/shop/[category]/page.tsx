@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ShopBrowser from "@/components/ShopBrowser";
-import { buildCategories, buildDisplayProducts } from "@/lib/catalog-build";
+import { buildCategories, buildDisplayProducts, catalogUnavailable } from "@/lib/catalog-build";
 import { categorySlug, categoryPlural, categoryGenitive } from "@/lib/slug";
 import { SITE_URL, productUrl, breadcrumbsJsonLd, jsonLdScript } from "@/lib/seo";
 
@@ -16,6 +16,13 @@ export const dynamicParams = false;
 
 export async function generateStaticParams(): Promise<{ category: string }[]> {
   const cats = await buildCategories();
+  // Понятная остановка сборки вместо невнятного «missing generateStaticParams»
+  // и защита от публикации сайта без каталога (см. app/product/[slug]).
+  if (catalogUnavailable()) {
+    throw new Error(
+      "PocketBase (api.bloomnook.ru) недоступен — сборка остановлена, чтобы не опубликовать сайт без страниц категорий. Проверьте API-сервер и перезапустите деплой.",
+    );
+  }
   return cats.map((c) => ({ category: categorySlug(c) }));
 }
 

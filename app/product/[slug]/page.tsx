@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ProductView from "@/components/ProductView";
 import LiveProductGrid from "@/components/LiveProductGrid";
-import { buildDisplayProducts } from "@/lib/catalog-build";
+import { buildDisplayProducts, catalogUnavailable } from "@/lib/catalog-build";
 import { productSlug } from "@/lib/slug";
 import {
   SITE_URL,
@@ -29,6 +29,14 @@ export const dynamicParams = false;
 
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
   const products = await buildDisplayProducts();
+  // Без базы сборку намеренно роняем с понятной ошибкой: иначе Next выдал бы
+  // невнятное «missing generateStaticParams», а молчаливый успех выкатил бы
+  // сайт вообще без страниц товаров, стерев их из поисковой выдачи.
+  if (catalogUnavailable()) {
+    throw new Error(
+      "PocketBase (api.bloomnook.ru) недоступен — сборка остановлена, чтобы не опубликовать сайт без страниц товаров. Проверьте API-сервер и перезапустите деплой.",
+    );
+  }
   const seen = new Set<string>();
   const params: { slug: string }[] = [];
   for (const p of products) {

@@ -28,6 +28,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Страницы товаров генерируются из PocketBase, поэтому без живого API
+      # собирать бессмысленно. Проверяем заранее (с повторами ~5 минут на
+      # случай короткого рестарта) и падаем с понятной ошибкой — вместо
+      # загадочного «missing generateStaticParams» в конце сборки.
+      - name: Check PocketBase API
+        env:
+          PB_URL: ${{ vars.NEXT_PUBLIC_PB_URL }}
+        run: |
+          if [ -z "$PB_URL" ]; then
+            echo "::warning::Переменная NEXT_PUBLIC_PB_URL не задана — проверка API пропущена"
+            exit 0
+          fi
+          for i in $(seq 1 10); do
+            if curl -sf -m 15 "$PB_URL/api/health" >/dev/null; then
+              echo "PocketBase доступен ($PB_URL)"
+              exit 0
+            fi
+            echo "Попытка $i/10: $PB_URL не отвечает, ждём 30 с…"
+            sleep 30
+          done
+          echo "::error::PocketBase ($PB_URL) недоступен уже ~5 минут — деплой остановлен, чтобы не опубликовать сайт без каталога. Проверьте API-сервер (хостинг, оплата, перезапуск) и запустите деплой заново из вкладки Actions."
+          exit 1
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
