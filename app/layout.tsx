@@ -27,6 +27,8 @@ export const metadata: Metadata = {
   description:
     "Интернет-магазин луковиц цветов: тюльпаны, лилии, нарциссы и редкие сорта. Отборный калиброванный посадочный материал, бесплатная доставка по всей России, памятка по посадке в каждом заказе.",
   alternates: { canonical: "/" },
+  // Подтверждение прав на сайт в Яндекс.Вебмастере (метатег yandex-verification).
+  verification: { yandex: "d0dbd2fe2b2ea955" },
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
