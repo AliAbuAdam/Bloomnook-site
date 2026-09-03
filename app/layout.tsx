@@ -6,6 +6,7 @@ import Announcement from "@/components/Announcement";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CookieBanner from "@/components/CookieBanner";
+import YandexMetrika from "@/components/YandexMetrika";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { SITE_URL, SITE_NAME, organizationJsonLd, jsonLdScript } from "@/lib/seo";
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ru" className={inter.variable}>
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScript(organizationJsonLd())} />
+        <YandexMetrika />
         <MotifSprite />
         <AuthProvider>
           <CartProvider>
