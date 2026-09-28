@@ -56,7 +56,7 @@ export function productJsonLd(p: Product): object {
             priceCurrency: "RUB",
             availability: p.inStock
               ? "https://schema.org/InStock"
-              : "https://schema.org/PreOrder",
+              : "https://schema.org/OutOfStock",
             seller: { "@type": "Organization", name: SITE_NAME },
           },
         }
