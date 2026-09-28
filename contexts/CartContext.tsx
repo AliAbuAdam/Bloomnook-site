@@ -92,6 +92,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [lines, hydrated]);
 
   const add = useCallback((product: Product, pack: number, qty: number) => {
+    // Товар не в наличии заказать нельзя — кнопки на витрине заблокированы,
+    // а это последний рубеж на случай прямого вызова.
+    if (!product.inStock) return;
     const p = Math.max(1, Math.floor(pack || 1));
     const q = Math.max(1, Math.floor(qty || 1));
     const id = String(product.id);

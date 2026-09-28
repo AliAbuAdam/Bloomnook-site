@@ -296,7 +296,7 @@ export default function ShopBrowser({ fallback, initialCat }: { fallback: Produc
             </label>
             <label style={filterRow} onClick={() => setStock((cur) => toggle(cur, "order"))}>
               <Checkbox checked={stock.has("order")} />
-              Под заказ
+              Нет в наличии
             </label>
           </div>
         </div>

@@ -11,6 +11,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { createOrder } from "@/lib/orders";
 import { createPayment } from "@/lib/payments";
+import { fetchAvailability } from "@/lib/products";
 import { money } from "@/lib/data";
 
 const gridCols = "2.4fr 1fr 1.2fr 1fr 40px";
@@ -68,12 +69,44 @@ export default function CartPage() {
     if (lines.length === 0) setMode("cart");
   }, [lines.length]);
 
+  // Наличие товаров корзины по данным базы: товар могли снять с продажи или
+  // удалить, пока он лежал в корзине (она хранится в localStorage).
+  // null — проверка ещё не выполнялась (или не удалась — тогда не блокируем,
+  // финальная проверка всё равно случится в placeOrder).
+  const [availability, setAvailability] = useState<Record<string, boolean> | null>(null);
+  const lineIds = lines.map((l) => l.id).join(",");
+  useEffect(() => {
+    if (!hydrated || !lineIds) {
+      setAvailability(null);
+      return;
+    }
+    let alive = true;
+    fetchAvailability(lineIds.split(","))
+      .then((map) => {
+        if (alive) setAvailability(map);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [hydrated, lineIds]);
+
+  /** Строка корзины недоступна для заказа (товар кончился или удалён). */
+  const isUnavailable = (id: string) => availability !== null && availability[id] === false;
+  const hasUnavailable = lines.some((l) => isUnavailable(l.id));
+  const unavailableError =
+    "В корзине есть товары, которых нет в наличии. Удалите их, чтобы оформить заказ.";
+
   function goToCheckout() {
     if (!user) {
       setAuthOpen(true);
       return;
     }
     if (lines.length === 0) return;
+    if (hasUnavailable) {
+      setError(unavailableError);
+      return;
+    }
     setError("");
     setMode("checkout");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -100,6 +133,15 @@ export default function CartPage() {
     setPlacing(true);
     setError("");
     try {
+      // Контрольная проверка наличия непосредственно перед созданием заказа:
+      // товар мог кончиться, пока покупатель заполнял форму.
+      const fresh = await fetchAvailability(lines.map((l) => l.id));
+      setAvailability(fresh);
+      if (lines.some((l) => fresh[l.id] === false)) {
+        setError(unavailableError);
+        setMode("cart");
+        return;
+      }
       const items = lines.map((l) => ({
         name: l.pack > 1 ? `${l.name} (${l.pack} шт)` : l.name,
         qty: l.qty,
@@ -253,6 +295,11 @@ export default function CartPage() {
                           {l.cat}
                           {l.pack > 1 ? ` · комплект ${l.pack} шт` : ""}
                         </div>
+                        {isUnavailable(l.id) && (
+                          <div style={{ fontSize: 12.5, color: "#9C3A26", fontWeight: 700, marginTop: 3 }}>
+                            Нет в наличии — удалите из корзины
+                          </div>
+                        )}
                       </div>
                     </div>
                     <span className="bn-cc-price" style={{ fontWeight: 600 }}>{packPrice(l.unitPrice, l.pack)}</span>

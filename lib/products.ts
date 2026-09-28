@@ -64,7 +64,19 @@ export async function isCurrentUserAdmin(): Promise<boolean> {
   return rows.length > 0;
 }
 
-export const MOTIFS: Motif[] = ["tulip", "narcissus", "hyacinth", "lily", "crocus"];
+export const MOTIFS: Motif[] = [
+  "tulip",
+  "narcissus",
+  "hyacinth",
+  "lily",
+  "crocus",
+  "amaryllis",
+  "iris",
+  "gladiolus",
+  "allium",
+  "muscari",
+  "dahlia",
+];
 export const CATEGORIES = ["Тюльпан", "Лилия", "Нарцисс", "Гименокаллис", "Эукомис"];
 export const SEASONS: { value: Season; label: string }[] = [
   { value: "autumn", label: "Осенняя посадка" },
@@ -219,6 +231,21 @@ export async function fetchProductById(id: string): Promise<AdminProduct | null>
   } catch {
     return null;
   }
+}
+
+/**
+ * Наличие товаров по списку id записей — для проверки корзины перед
+ * оформлением. Товар, которого больше нет в базе, считается недоступным.
+ */
+export async function fetchAvailability(ids: string[]): Promise<Record<string, boolean>> {
+  const unique = Array.from(new Set(ids));
+  const entries = await Promise.all(
+    unique.map(async (id) => {
+      const p = await fetchProductById(id);
+      return [id, !!p && p.inStock] as const;
+    }),
+  );
+  return Object.fromEntries(entries);
 }
 
 /** Загрузить один товар по id в форме для витрины (страница товара). */

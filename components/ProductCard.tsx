@@ -26,6 +26,7 @@ export default function ProductCard({
   function handleAdd(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
+    if (!item.inStock) return;
     add(item, item.packsOnly ? (item.packs[0] ?? 1) : 1, 1);
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1600);
@@ -59,7 +60,25 @@ export default function ProductCard({
           overflow: "hidden",
         }}
       >
-        {item.hasDisc && (
+        {/* Для отсутствующего товара плашка наличия важнее скидки. */}
+        {!item.inStock ? (
+          <span
+            style={{
+              position: "absolute",
+              top: 13,
+              left: 13,
+              background: "#FCEDE9",
+              border: "1px solid #F0C5BA",
+              color: "#9C3A26",
+              fontSize: 12,
+              fontWeight: 700,
+              padding: "5px 11px",
+              borderRadius: 999,
+            }}
+          >
+            Нет в наличии
+          </span>
+        ) : item.hasDisc ? (
           <span
             style={{
               position: "absolute",
@@ -75,7 +94,7 @@ export default function ProductCard({
           >
             {item.disc}
           </span>
-        )}
+        ) : null}
         {showHeart && (
           <span
             style={{
@@ -112,8 +131,8 @@ export default function ProductCard({
           </span>
         </div>
         <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, lineHeight: 1.3 }}>{item.name}</h3>
-        {item.lat && (
-          <span style={{ fontSize: 12.5, color: "#aab3a8", fontStyle: "italic", marginTop: -3 }}>{item.lat}</span>
+        {item.caliber && (
+          <span style={{ fontSize: 12.5, color: "#aab3a8", marginTop: -3 }}>Разбор: {item.caliber}</span>
         )}
         {(item.height || item.bloom) && (
           <div style={{ fontSize: 12.5, color: "var(--muted)", display: "flex", flexWrap: "wrap", gap: "2px 12px" }}>
@@ -139,18 +158,19 @@ export default function ProductCard({
         {showButton && (
           <button
             onClick={handleAdd}
-            className="bn-hover-fade"
+            disabled={!item.inStock}
+            className={item.inStock ? "bn-hover-fade" : undefined}
             style={{
               marginTop: "auto",
               border: "none",
               fontFamily: "inherit",
-              background: added ? "var(--green)" : "var(--accent)",
-              color: "#fff",
+              background: !item.inStock ? "var(--sage)" : added ? "var(--green)" : "var(--accent)",
+              color: !item.inStock ? "var(--muted)" : "#fff",
               fontWeight: 700,
               fontSize: 14,
               padding: 11,
               borderRadius: 11,
-              cursor: "pointer",
+              cursor: item.inStock ? "pointer" : "default",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -158,7 +178,7 @@ export default function ProductCard({
             }}
           >
             {added ? <Check size={16} strokeWidth={2.4} /> : null}
-            {added ? "Добавлено" : "В корзину"}
+            {!item.inStock ? "Нет в наличии" : added ? "Добавлено" : "В корзину"}
           </button>
         )}
       </div>

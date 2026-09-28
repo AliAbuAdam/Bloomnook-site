@@ -260,7 +260,7 @@ export default function ProductView({
                 whiteSpace: "nowrap",
               }}
             >
-              {p.inStock ? "В наличии" : "Под заказ"}
+              {p.inStock ? "В наличии" : "Нет в наличии"}
             </span>
           </div>
           <h1 className="bn-h" style={{ fontSize: "clamp(28px, 5.5vw, 40px)", fontWeight: 600, margin: "0 0 6px", lineHeight: 1.1 }}>
@@ -394,21 +394,23 @@ export default function ProductView({
             </div>
             <button
               onClick={() => {
+                if (!p.inStock) return;
                 add(p, activePack, qty);
                 setAdded(true);
                 window.setTimeout(() => setAdded(false), 1600);
               }}
-              className="bn-hover-fade"
+              disabled={!p.inStock}
+              className={p.inStock ? "bn-hover-fade" : undefined}
               style={{
                 flex: 1,
                 border: "none",
-                background: added ? "var(--green)" : "var(--accent)",
-                color: "#fff",
+                background: !p.inStock ? "var(--sage)" : added ? "var(--green)" : "var(--accent)",
+                color: !p.inStock ? "var(--muted)" : "#fff",
                 fontWeight: 700,
                 fontSize: 16,
                 padding: 15,
                 borderRadius: 999,
-                cursor: "pointer",
+                cursor: p.inStock ? "pointer" : "default",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -416,7 +418,7 @@ export default function ProductView({
               }}
             >
               {added ? <Check size={19} strokeWidth={2.4} /> : <Cart size={19} strokeWidth={1.8} />}
-              {added ? "Добавлено" : "В корзину"}
+              {!p.inStock ? "Нет в наличии" : added ? "Добавлено" : "В корзину"}
             </button>
             <button
               style={{

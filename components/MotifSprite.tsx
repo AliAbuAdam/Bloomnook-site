@@ -67,6 +67,90 @@ export default function MotifSprite() {
           <path d="M75 92 C70 92 64 82 64 64 M75 92 C80 92 86 82 86 64 M75 92 L75 40" />
         </g>
       </symbol>
+      <symbol id="m-amaryllis" viewBox="0 0 150 190">
+        <g {...g}>
+          <path d="M75 94 L75 178" />
+          <path d="M75 140 C57 138 46 148 43 166 M75 150 C93 148 104 156 107 172" />
+          <ellipse cx="75" cy="24" rx="9" ry="16" />
+          <ellipse cx="98" cy="37" rx="9" ry="16" transform="rotate(60 98 37)" />
+          <ellipse cx="98" cy="63" rx="9" ry="16" transform="rotate(120 98 63)" />
+          <ellipse cx="75" cy="76" rx="9" ry="16" transform="rotate(180 75 76)" />
+          <ellipse cx="52" cy="63" rx="9" ry="16" transform="rotate(240 52 63)" />
+          <ellipse cx="52" cy="37" rx="9" ry="16" transform="rotate(300 52 37)" />
+          <circle cx="75" cy="50" r="7" />
+          <circle cx="75" cy="50" r="2.5" />
+        </g>
+      </symbol>
+      <symbol id="m-iris" viewBox="0 0 150 190">
+        <g {...g}>
+          <path d="M75 88 L75 178" />
+          <path d="M61 176 C59 142 61 114 67 90 M89 176 C91 142 89 114 83 90" />
+          <path d="M75 88 C62 78 56 60 60 36 C70 48 75 66 75 86" />
+          <path d="M75 88 C88 78 94 60 90 36 C80 48 75 66 75 86" />
+          <path d="M75 88 C75 64 75 46 75 26" />
+          <path d="M75 88 C61 90 51 100 47 116 C57 113 68 102 74 90" />
+          <path d="M75 88 C89 90 99 100 103 116 C93 113 82 102 76 90" />
+        </g>
+      </symbol>
+      <symbol id="m-gladiolus" viewBox="0 0 150 190">
+        <g {...g}>
+          <path d="M75 22 L75 178" />
+          <path d="M75 146 C60 144 50 152 46 168 M75 154 C90 152 100 160 104 174" />
+          <ellipse cx="75" cy="16" rx="4" ry="7" />
+          <path d="M75 40 C66 38 60 32 58 22 M75 40 C70 34 68 26 70 18" />
+          <path d="M75 62 C84 60 90 54 92 44 M75 62 C80 56 82 48 80 40" />
+          <path d="M75 84 C66 82 60 76 58 66 M75 84 C70 78 68 70 70 62" />
+          <path d="M75 106 C84 104 90 98 92 88 M75 106 C80 100 82 92 80 84" />
+        </g>
+      </symbol>
+      <symbol id="m-allium" viewBox="0 0 150 190">
+        <g {...g}>
+          <path d="M75 88 L75 178" />
+          <path d="M75 148 C59 146 48 154 44 170 M75 156 C91 154 102 162 106 176" />
+          <circle cx="75" cy="54" r="32" />
+          <path d="M75 54 L75 32 M75 54 L94 43 M75 54 L94 65 M75 54 L75 76 M75 54 L56 65 M75 54 L56 43" />
+          <circle cx="75" cy="32" r="2.4" />
+          <circle cx="94" cy="43" r="2.4" />
+          <circle cx="94" cy="65" r="2.4" />
+          <circle cx="75" cy="76" r="2.4" />
+          <circle cx="56" cy="65" r="2.4" />
+          <circle cx="56" cy="43" r="2.4" />
+        </g>
+      </symbol>
+      <symbol id="m-muscari" viewBox="0 0 150 190">
+        <g {...g}>
+          <path d="M75 98 L75 178" />
+          <path d="M61 176 C59 144 62 120 70 100 M89 176 C91 144 88 120 80 100" />
+          <circle cx="75" cy="28" r="6" />
+          <circle cx="66" cy="41" r="6" />
+          <circle cx="84" cy="41" r="6" />
+          <circle cx="59" cy="55" r="6" />
+          <circle cx="75" cy="54" r="6" />
+          <circle cx="91" cy="55" r="6" />
+          <circle cx="63" cy="69" r="6" />
+          <circle cx="87" cy="69" r="6" />
+          <circle cx="75" cy="68" r="6" />
+          <circle cx="69" cy="83" r="6" />
+          <circle cx="81" cy="83" r="6" />
+          <circle cx="75" cy="94" r="5" />
+        </g>
+      </symbol>
+      <symbol id="m-dahlia" viewBox="0 0 150 190">
+        <g {...g}>
+          <path d="M75 92 L75 178" />
+          <path d="M75 142 C58 140 47 150 44 168 M75 152 C92 150 103 158 106 174" />
+          <ellipse cx="75" cy="25" rx="6.5" ry="14" />
+          <ellipse cx="93" cy="32" rx="6.5" ry="14" transform="rotate(45 93 32)" />
+          <ellipse cx="100" cy="50" rx="6.5" ry="14" transform="rotate(90 100 50)" />
+          <ellipse cx="93" cy="68" rx="6.5" ry="14" transform="rotate(135 93 68)" />
+          <ellipse cx="75" cy="75" rx="6.5" ry="14" transform="rotate(180 75 75)" />
+          <ellipse cx="57" cy="68" rx="6.5" ry="14" transform="rotate(225 57 68)" />
+          <ellipse cx="50" cy="50" rx="6.5" ry="14" transform="rotate(270 50 50)" />
+          <ellipse cx="57" cy="32" rx="6.5" ry="14" transform="rotate(315 57 32)" />
+          <circle cx="75" cy="50" r="11" />
+          <path d="M75 50 L75 41 M75 50 L81 44 M75 50 L84 50 M75 50 L81 56 M75 50 L75 59 M75 50 L69 56 M75 50 L66 50 M75 50 L69 44" />
+        </g>
+      </symbol>
     </svg>
   );
 }

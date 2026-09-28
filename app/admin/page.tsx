@@ -27,6 +27,12 @@ const MOTIF_LABELS: Record<string, string> = {
   hyacinth: "Гиацинт",
   lily: "Лилия",
   crocus: "Крокус",
+  amaryllis: "Амариллис",
+  iris: "Ирис",
+  gladiolus: "Гладиолус",
+  allium: "Аллиум",
+  muscari: "Мускари",
+  dahlia: "Георгин",
 };
 
 const input: React.CSSProperties = {
@@ -892,7 +898,7 @@ export default function AdminPage() {
               <span className="bn-ar-cat" style={{ color: "var(--muted)" }}>{p.cat}</span>
               <span className="bn-ar-price" style={{ fontWeight: 700 }}>{money(p.price)}</span>
               <span className="bn-ar-disc" style={{ color: p.disc ? "var(--green)" : "var(--muted)" }}>{p.disc ? `−${p.disc}%` : "—"}</span>
-              <span className="bn-ar-stock" style={{ color: p.inStock ? "var(--green)" : "#c0392b", fontWeight: 600 }}>{p.inStock ? "В наличии" : "Под заказ"}</span>
+              <span className="bn-ar-stock" style={{ color: p.inStock ? "var(--green)" : "#c0392b", fontWeight: 600 }}>{p.inStock ? "В наличии" : "Нет в наличии"}</span>
               <span className="bn-ar-act" style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
                 <button style={{ ...ghostBtn, padding: "7px 14px", fontSize: 13 }} onClick={() => openEdit(p)}>
                   Изм.

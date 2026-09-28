@@ -1,4 +1,15 @@
-export type Motif = "tulip" | "narcissus" | "hyacinth" | "lily" | "crocus";
+export type Motif =
+  | "tulip"
+  | "narcissus"
+  | "hyacinth"
+  | "lily"
+  | "crocus"
+  | "amaryllis"
+  | "iris"
+  | "gladiolus"
+  | "allium"
+  | "muscari"
+  | "dahlia";
 
 /** Контакты и соцсети Bloom Nook — единый источник для шапки, подвала и страницы контактов. */
 export const CONTACT = {
@@ -120,7 +131,7 @@ export const categories: Category[] = [
   { name: "Гиацинты", motif: "hyacinth", count: "24 сорта" },
   { name: "Лилии", motif: "lily", count: "40 сортов" },
   { name: "Крокусы", motif: "crocus", count: "18 сортов" },
-  { name: "Ирисы", motif: "lily", count: "22 сорта" },
+  { name: "Ирисы", motif: "iris", count: "22 сорта" },
 ].map((c) => ({ ...c, motif: c.motif as Motif, useHref: "#m-" + c.motif }));
 
 export interface Step {
